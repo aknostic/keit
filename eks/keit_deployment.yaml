@@ -1,0 +1,21 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: keit-deployment
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: keit-app
+  template:
+    metadata:
+      labels:
+        app: keit-app
+    spec:
+      containers:
+      - name: keit-app-container
+        image: 623566434957.dkr.ecr.eu-west-1.amazonaws.com/keit:latest
+        imagePullPolicy: Always
+        ports:
+        - containerPort: 8080
+

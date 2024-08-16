@@ -156,7 +156,7 @@ func main() {
 	// Run the recordMetrics function periodically
 	for {
 		recordMetrics(clientset)
-		time.Sleep(15 * time.Second)
+		time.Sleep(300 * time.Second)
 	}
 }
 

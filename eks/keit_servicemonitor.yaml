@@ -13,7 +13,7 @@ spec:
   endpoints:
     - port: metrics 
       path: /metrics
-      interval: 5m 
+      interval: 15m
       scrapeTimeout: 2m
   namespaceSelector:
     matchNames:

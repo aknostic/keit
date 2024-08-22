@@ -1,3 +1,8 @@
+
+To create the EKS cluster, from the commandline:
+eksctl create cluster -f cluster-config.yaml
+
+-----
 go mod init keit
 go mod tidy
 

@@ -1,0 +1,26 @@
+apiVersion: eksctl.io/v1alpha5
+kind: ClusterConfig
+
+metadata:
+  name: KEIT 
+  region: eu-west-1 
+  version: "1.30"
+
+managedNodeGroups:
+  - name: eks-keit
+    instanceType: t3.medium
+    desiredCapacity: 2
+
+iam:
+  withOIDC: true
+  serviceAccounts:
+  - metadata:
+      name: aws-load-balancer-controller
+      namespace: kube-system
+    wellKnownPolicies:
+      awsLoadBalancerController: true
+
+addons:
+  - name: aws-ebs-csi-driver
+    wellKnownPolicies: # Adds an IAM service account
+      ebsCSIController: true

@@ -2,6 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: boavizta
+  namespace: boavizta
   labels:
     app: boavizta
 spec:
@@ -32,6 +33,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: boavizta-service
+  namespace: boavizta
   labels:
     app: boavizta
 spec:

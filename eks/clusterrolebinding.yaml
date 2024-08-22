@@ -5,7 +5,7 @@ metadata:
 subjects:
 - kind: ServiceAccount
   name: default
-  namespace: default
+  namespace: keit
 roleRef:
   kind: ClusterRole
   name: pod-reader

@@ -2,7 +2,7 @@ apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
   name: keit-service-monitor
-  namespace: default
+  namespace: keit
   labels:
     app.kubernetes.io/name: keit-service-monitor
     release: prometheus

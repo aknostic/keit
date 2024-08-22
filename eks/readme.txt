@@ -25,12 +25,28 @@ This local pod is used by keit to the the embodied carbon of the servers
 
 -----
 get the pod to run:
-keit_deployment.yaml  (TODO it runs now in default namespace)
+keit_deployment.yaml
 
-Add the role bindings otherwise we do not have access TODO, is this good its now wide open?
-clusterrole-node-reader.yaml
+Add the role bindings otherwise we the keit.go does not have access to readout all the pods on and all the nodes (runs only in keit namespace):
+for the pods:
 clusterrole.yaml
-
-clusterrolebinding-node-reader.yaml
 clusterrolebinding.yaml
 
+for the nodes:
+clusterrole-node-reader.yaml
+clusterrolebinding-node-reader.yaml
+
+-----
+Usage, examples:
+
+Grafana:
+kubectl -n prometheus port-forward svc/prometheus-grafana 3000:80 &
+(check in browser, username, password)
+
+Prometheus:
+kubectl -n prometheus port-forward svc/prometheus-operated 9090 &
+(check browser)
+
+check the keit metrics, embodied/embedded value of instances.
+kubectl -n keit port-forward service/keit-service 8080:8080 &
+curl -s http://localhost:8080/metrics

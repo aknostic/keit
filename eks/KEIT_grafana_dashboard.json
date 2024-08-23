@@ -1097,7 +1097,7 @@
           "refId": "A"
         }
       ],
-      "title": "Energy (E) in kWh in last 15 min - Host cluster",
+      "title": "Energy (E) in kWh - KEIT cluster",
       "type": "timeseries"
     }
   ],
@@ -1109,8 +1109,8 @@
       {
         "current": {
           "selected": false,
-          "text": "Prometheus",
-          "value": "prometheus"
+          "text": "default",
+          "value": "default"
         },
         "hide": 0,
         "includeAll": false,
@@ -1214,8 +1214,8 @@
         "allValue": "",
         "current": {
           "selected": false,
-          "text": "11.237997442227343",
-          "value": "11.237997442227343"
+          "text": "4.987581075603106",
+          "value": "4.987581075603106"
         },
         "datasource": {
           "type": "prometheus",
@@ -1243,8 +1243,8 @@
       {
         "current": {
           "selected": false,
-          "text": "255.06250000000003",
-          "value": "255.06250000000003"
+          "text": "346.50000000000006",
+          "value": "346.50000000000006"
         },
         "datasource": {
           "type": "prometheus",
@@ -1272,8 +1272,8 @@
       {
         "current": {
           "selected": false,
-          "text": "35.049288061336256",
-          "value": "35.049288061336256"
+          "text": "NaN",
+          "value": "NaN"
         },
         "datasource": {
           "type": "prometheus",
@@ -1301,8 +1301,8 @@
       {
         "current": {
           "selected": false,
-          "text": "3288.4038932215435",
-          "value": "3288.4038932215435"
+          "text": "NaN",
+          "value": "NaN"
         },
         "datasource": {
           "type": "prometheus",
@@ -1335,6 +1335,6 @@
   "timezone": "",
   "title": "Carbon intensity EKS - KEIT (Ierland)",
   "uid": "babfe92a-42e3-45fd-baf1-ea503e23fca6",
-  "version": 40,
+  "version": 2,
   "weekStart": ""
 }

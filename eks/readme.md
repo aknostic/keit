@@ -21,9 +21,7 @@ With docker images, you will find the new keit image.
 now tag it and push it to ecr.
 ```
 docker tag keit 623566434957.dkr.ecr.eu-west-1.amazonaws.com/keit:latest
-
 aws aws ecr get-login-password --region eu-west-1 | docker login --username AWS --password-stdin 623566434957.dkr.ecr.eu-west-1.amazonaws.com
-
 docker push 623566434957.dkr.ecr.eu-west-1.amazonaws.com/keit:latest
 ```
 -----
@@ -33,8 +31,6 @@ via deployment
 ```
 kubectl apply -f deployment_boavizta.yaml
 ```
-
-
 This local pod is used by keit to get the embodied carbon of the servers
 
 -----
@@ -50,14 +46,12 @@ kubectl apply -f keit_deployment.yaml
 Add the role bindings otherwise we the keit.go does not have access to readout all the pods on and all the nodes (runs only in keit namespace):
 
 for the pods:
-
 ```
 kubectl apply -f clusterrole.yaml
 kubectl apply -f clusterrolebinding.yaml
 ```
 
 for the nodes:
-
 ```
 kubectl apply -f clusterrole-node-reader.yaml
 kubectl apply -f clusterrolebinding-node-reader.yaml

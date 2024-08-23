@@ -23,12 +23,89 @@
   "liveNow": false,
   "panels": [
     {
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "palette-classic"
+          },
+          "custom": {
+            "axisBorderShow": false,
+            "axisCenteredZero": false,
+            "axisColorMode": "text",
+            "axisLabel": "",
+            "axisPlacement": "auto",
+            "barAlignment": 0,
+            "drawStyle": "line",
+            "fillOpacity": 0,
+            "gradientMode": "none",
+            "hideFrom": {
+              "legend": false,
+              "tooltip": false,
+              "viz": false
+            },
+            "insertNulls": false,
+            "lineInterpolation": "linear",
+            "lineWidth": 1,
+            "pointSize": 5,
+            "scaleDistribution": {
+              "type": "linear"
+            },
+            "showPoints": "auto",
+            "spanNulls": false,
+            "stacking": {
+              "group": "A",
+              "mode": "none"
+            },
+            "thresholdsStyle": {
+              "mode": "off"
+            }
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 8,
+        "w": 12,
+        "x": 0,
+        "y": 0
+      },
+      "id": 59,
+      "options": {
+        "legend": {
+          "calcs": [],
+          "displayMode": "list",
+          "placement": "bottom",
+          "showLegend": true
+        },
+        "tooltip": {
+          "mode": "single",
+          "sort": "none"
+        }
+      },
+      "title": "Panel Title",
+      "type": "timeseries"
+    },
+    {
       "collapsed": false,
       "gridPos": {
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 0
+        "y": 8
       },
       "id": 7,
       "panels": [],
@@ -44,7 +121,7 @@
         "h": 10,
         "w": 5,
         "x": 0,
-        "y": 1
+        "y": 9
       },
       "id": 3,
       "options": {
@@ -70,7 +147,7 @@
         "h": 10,
         "w": 5,
         "x": 5,
-        "y": 1
+        "y": 9
       },
       "id": 2,
       "options": {
@@ -96,7 +173,7 @@
         "h": 10,
         "w": 5,
         "x": 10,
-        "y": 1
+        "y": 9
       },
       "id": 4,
       "options": {
@@ -122,7 +199,7 @@
         "h": 10,
         "w": 5,
         "x": 15,
-        "y": 1
+        "y": 9
       },
       "id": 5,
       "options": {
@@ -148,7 +225,7 @@
         "h": 10,
         "w": 4,
         "x": 20,
-        "y": 1
+        "y": 9
       },
       "id": 6,
       "options": {
@@ -171,7 +248,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 11
+        "y": 19
       },
       "id": 8,
       "panels": [],
@@ -210,7 +287,7 @@
         "h": 9,
         "w": 5,
         "x": 0,
-        "y": 12
+        "y": 20
       },
       "id": 57,
       "options": {
@@ -283,7 +360,7 @@
         "h": 9,
         "w": 5,
         "x": 5,
-        "y": 12
+        "y": 20
       },
       "id": 10,
       "options": {
@@ -351,7 +428,7 @@
         "h": 9,
         "w": 5,
         "x": 10,
-        "y": 12
+        "y": 20
       },
       "id": 11,
       "options": {
@@ -396,7 +473,7 @@
         "h": 9,
         "w": 5,
         "x": 15,
-        "y": 12
+        "y": 20
       },
       "id": 12,
       "options": {
@@ -443,7 +520,7 @@
         "h": 9,
         "w": 4,
         "x": 20,
-        "y": 12
+        "y": 20
       },
       "id": 13,
       "options": {
@@ -510,7 +587,7 @@
         "h": 8,
         "w": 24,
         "x": 0,
-        "y": 21
+        "y": 29
       },
       "id": 58,
       "options": {
@@ -609,7 +686,7 @@
         "h": 9,
         "w": 24,
         "x": 0,
-        "y": 29
+        "y": 37
       },
       "id": 45,
       "options": {
@@ -715,7 +792,7 @@
         "h": 9,
         "w": 24,
         "x": 0,
-        "y": 38
+        "y": 46
       },
       "id": 47,
       "options": {
@@ -810,7 +887,7 @@
         "h": 10,
         "w": 24,
         "x": 0,
-        "y": 47
+        "y": 55
       },
       "id": 46,
       "options": {
@@ -895,7 +972,7 @@
         "h": 12,
         "w": 24,
         "x": 0,
-        "y": 57
+        "y": 65
       },
       "id": 50,
       "options": {
@@ -966,7 +1043,7 @@
         "h": 14,
         "w": 7,
         "x": 0,
-        "y": 69
+        "y": 77
       },
       "id": 42,
       "options": {
@@ -1068,7 +1145,7 @@
         "h": 14,
         "w": 9,
         "x": 7,
-        "y": 69
+        "y": 77
       },
       "id": 44,
       "options": {
@@ -1099,6 +1176,76 @@
       ],
       "title": "Energy (E) in kWh - KEIT cluster",
       "type": "timeseries"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
+      },
+      "description": "see:\nhttps://github.com/hoernschen/grasp/tree/main/src/lib/comparison/distance\n\nPlane: 122.72 g per km",
+      "fieldConfig": {
+        "defaults": {
+          "color": {
+            "mode": "thresholds"
+          },
+          "mappings": [],
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "green",
+                "value": null
+              },
+              {
+                "color": "red",
+                "value": 80
+              }
+            ]
+          }
+        },
+        "overrides": []
+      },
+      "gridPos": {
+        "h": 14,
+        "w": 5,
+        "x": 16,
+        "y": 77
+      },
+      "id": 60,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "justifyMode": "auto",
+        "orientation": "auto",
+        "percentChangeColorMode": "standard",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ],
+          "fields": "",
+          "values": false
+        },
+        "showPercentChange": false,
+        "textMode": "auto",
+        "wideLayout": true
+      },
+      "pluginVersion": "11.1.0",
+      "targets": [
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "prometheus"
+          },
+          "editorMode": "code",
+          "expr": "(($Energy * $EnergyCarbonIntensity * $PUE_avr_aws) + $Embodied)/122.72",
+          "instant": false,
+          "legendFormat": "__auto",
+          "range": true,
+          "refId": "A"
+        }
+      ],
+      "title": "How many flight KM",
+      "type": "stat"
     }
   ],
   "refresh": "",
@@ -1214,8 +1361,8 @@
         "allValue": "",
         "current": {
           "selected": false,
-          "text": "1.4049051460361626",
-          "value": "1.4049051460361626"
+          "text": "6.293338417858637",
+          "value": "6.293338417858637"
         },
         "datasource": {
           "type": "prometheus",
@@ -1243,8 +1390,8 @@
       {
         "current": {
           "selected": false,
-          "text": "299",
-          "value": "299"
+          "text": "338.9642857142858",
+          "value": "338.9642857142858"
         },
         "datasource": {
           "type": "prometheus",
@@ -1272,8 +1419,8 @@
       {
         "current": {
           "selected": false,
-          "text": "NaN",
-          "value": "NaN"
+          "text": "35.049288061336256",
+          "value": "35.049288061336256"
         },
         "datasource": {
           "type": "prometheus",
@@ -1301,8 +1448,8 @@
       {
         "current": {
           "selected": false,
-          "text": "NaN",
-          "value": "NaN"
+          "text": "2456.2505394407053",
+          "value": "2456.2505394407053"
         },
         "datasource": {
           "type": "prometheus",
@@ -1328,13 +1475,13 @@
     ]
   },
   "time": {
-    "from": "now-6h",
+    "from": "now-2d",
     "to": "now"
   },
   "timepicker": {},
   "timezone": "",
   "title": "Carbon intensity EKS - KEIT (Ierland)",
   "uid": "babfe92a-42e3-45fd-baf1-ea503e23fca6",
-  "version": 3,
+  "version": 4,
   "weekStart": ""
 }

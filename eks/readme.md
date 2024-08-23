@@ -52,15 +52,15 @@ Add the role bindings otherwise we the keit.go does not have access to readout a
 for the pods:
 
 ```
-clusterrole.yaml
-clusterrolebinding.yaml
+kubectl apply -f clusterrole.yaml
+kubectl apply -f clusterrolebinding.yaml
 ```
 
 for the nodes:
 
 ```
-clusterrole-node-reader.yaml
-clusterrolebinding-node-reader.yaml
+kubectl apply -f clusterrole-node-reader.yaml
+kubectl apply -f clusterrolebinding-node-reader.yaml
 ```
 
 -----
@@ -69,7 +69,7 @@ clusterrolebinding-node-reader.yaml
 Grafana:
 ```
 kubectl -n prometheus port-forward svc/prometheus-grafana 3000:80 &
-[127.0.0.1:3000](http://127.0.0.1:3000 )  
+http://127.0.0.1:3000 
 ```
 Check in browser, username, password.
 Look for the dashboard **Carbon intensity EKS - KEIT (Ierland)** if not there import the file KEIT_grafana_dashboard.json into grafana.
@@ -77,8 +77,7 @@ Look for the dashboard **Carbon intensity EKS - KEIT (Ierland)** if not there im
 Prometheus:
 ```
 kubectl -n prometheus port-forward svc/prometheus-operated 9090 &
-
-[http://127.0.0.1:9090](http://127.0.0.1:9090)
+http://127.0.0.1:9090
 
 ```
 (check browser)

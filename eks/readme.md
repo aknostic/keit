@@ -78,9 +78,7 @@ Prometheus:
 ```
 kubectl -n prometheus port-forward svc/prometheus-operated 9090 &
 http://127.0.0.1:9090
-
 ```
-(check browser)
 
 check the keit metrics, embodied/embedded value of instances.
 ```

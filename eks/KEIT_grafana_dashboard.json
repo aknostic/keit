@@ -512,7 +512,7 @@
         "x": 0,
         "y": 21
       },
-      "id": 43,
+      "id": 58,
       "options": {
         "displayMode": "gradient",
         "maxVizHeight": 300,
@@ -539,14 +539,14 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "sum by (container_namespace) (\n  increase(\n      (kepler_container_joules_total{container_namespace=~\"$namespace\", pod_name=~\"$pod\"}[15m])\n  )\n) * $watt_per_second_to_kWh ",
+          "expr": "sum by (container_namespace) (\n  increase(\n      (kepler_container_joules_total{container_namespace=~\"$namespace\", pod_name=~\"$pod\"}[$__range])\n  )\n) * $watt_per_second_to_kWh ",
           "instant": false,
           "legendFormat": "__auto",
           "range": true,
           "refId": "A"
         }
       ],
-      "title": "Total Power Consumption (PKG+DRAM+OTHER+GPU) by Namespace (kWh 15m)",
+      "title": "Total Power Consumption (PKG+DRAM+OTHER+GPU) by Namespace (kWh)",
       "type": "bargauge"
     },
     {
@@ -995,7 +995,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "sum by (container_namespace) (\n  increase(\n      (kepler_container_joules_total{container_namespace=~\"$namespace\", pod_name=~\"$pod\"}[15m])\n  )\n) * $watt_per_second_to_kWh ",
+          "expr": "sum by (container_namespace) (\n  increase(\n      (kepler_container_joules_total{container_namespace=~\"$namespace\", pod_name=~\"$pod\"}[$__range])\n  )\n) * $watt_per_second_to_kWh ",
           "instant": false,
           "legendFormat": "__auto",
           "range": true,
@@ -1109,8 +1109,8 @@
       {
         "current": {
           "selected": false,
-          "text": "default",
-          "value": "default"
+          "text": "Prometheus",
+          "value": "prometheus"
         },
         "hide": 0,
         "includeAll": false,
@@ -1214,8 +1214,8 @@
         "allValue": "",
         "current": {
           "selected": false,
-          "text": "4.987581075603106",
-          "value": "4.987581075603106"
+          "text": "1.4049051460361626",
+          "value": "1.4049051460361626"
         },
         "datasource": {
           "type": "prometheus",
@@ -1243,8 +1243,8 @@
       {
         "current": {
           "selected": false,
-          "text": "346.50000000000006",
-          "value": "346.50000000000006"
+          "text": "299",
+          "value": "299"
         },
         "datasource": {
           "type": "prometheus",
@@ -1328,13 +1328,13 @@
     ]
   },
   "time": {
-    "from": "now-2d",
+    "from": "now-6h",
     "to": "now"
   },
   "timepicker": {},
   "timezone": "",
   "title": "Carbon intensity EKS - KEIT (Ierland)",
   "uid": "babfe92a-42e3-45fd-baf1-ea503e23fca6",
-  "version": 2,
+  "version": 3,
   "weekStart": ""
 }

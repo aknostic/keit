@@ -11,8 +11,8 @@ go build -o keit .
 CGO_ENABLED=0 GOOS=linux go build -o keit .
 docker build -t keit .
 
-# with docker images, you will find the new keit image.
-# now tag it and push it to ecr.
+With docker images, you will find the new keit image.
+now tag it and push it to ecr.
 
 docker tag keit 623566434957.dkr.ecr.eu-west-1.amazonaws.com/keit:latest
 

@@ -50,3 +50,6 @@ kubectl -n prometheus port-forward svc/prometheus-operated 9090 &
 check the keit metrics, embodied/embedded value of instances.
 kubectl -n keit port-forward service/keit-service 8080:8080 &
 curl -s http://localhost:8080/metrics
+-----
+
+![keit](https://github.com/user-attachments/assets/cd6fe0e3-19e5-4331-b239-d5a48661b763)

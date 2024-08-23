@@ -69,16 +69,17 @@ kubectl apply -f clusterrolebinding-node-reader.yaml
 Grafana:
 ```
 kubectl -n prometheus port-forward svc/prometheus-grafana 3000:80 &
-http://127.0.0.1:3000 
 ```
+[http://127.0.0.1:3000](http://127.0.0.1:3000 )
+
 Check in browser, username, password.
 Look for the dashboard **Carbon intensity EKS - KEIT (Ierland)** if not there import the file KEIT_grafana_dashboard.json into grafana.
 
 Prometheus:
 ```
 kubectl -n prometheus port-forward svc/prometheus-operated 9090 &
-http://127.0.0.1:9090
 ```
+[http://127.0.0.1:9090](http://127.0.0.1:9090)
 
 check the keit metrics, embodied/embedded value of instances.
 ```

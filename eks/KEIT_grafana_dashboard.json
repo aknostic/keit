@@ -18,86 +18,34 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 28,
+  "id": 29,
   "links": [],
   "liveNow": false,
   "panels": [
     {
-      "fieldConfig": {
-        "defaults": {
-          "color": {
-            "mode": "palette-classic"
-          },
-          "custom": {
-            "axisBorderShow": false,
-            "axisCenteredZero": false,
-            "axisColorMode": "text",
-            "axisLabel": "",
-            "axisPlacement": "auto",
-            "barAlignment": 0,
-            "drawStyle": "line",
-            "fillOpacity": 0,
-            "gradientMode": "none",
-            "hideFrom": {
-              "legend": false,
-              "tooltip": false,
-              "viz": false
-            },
-            "insertNulls": false,
-            "lineInterpolation": "linear",
-            "lineWidth": 1,
-            "pointSize": 5,
-            "scaleDistribution": {
-              "type": "linear"
-            },
-            "showPoints": "auto",
-            "spanNulls": false,
-            "stacking": {
-              "group": "A",
-              "mode": "none"
-            },
-            "thresholdsStyle": {
-              "mode": "off"
-            }
-          },
-          "mappings": [],
-          "thresholds": {
-            "mode": "absolute",
-            "steps": [
-              {
-                "color": "green",
-                "value": null
-              },
-              {
-                "color": "red",
-                "value": 80
-              }
-            ]
-          }
-        },
-        "overrides": []
+      "datasource": {
+        "type": "prometheus",
+        "uid": "prometheus"
       },
       "gridPos": {
-        "h": 8,
-        "w": 12,
+        "h": 2,
+        "w": 2,
         "x": 0,
         "y": 0
       },
-      "id": 59,
+      "id": 61,
       "options": {
-        "legend": {
-          "calcs": [],
-          "displayMode": "list",
-          "placement": "bottom",
-          "showLegend": true
+        "code": {
+          "language": "plaintext",
+          "showLineNumbers": false,
+          "showMiniMap": false
         },
-        "tooltip": {
-          "mode": "single",
-          "sort": "none"
-        }
+        "content": "${PUE_avr_aws}",
+        "mode": "markdown"
       },
-      "title": "Panel Title",
-      "type": "timeseries"
+      "pluginVersion": "11.1.0",
+      "title": "PUE aws - eu-west-1",
+      "type": "text"
     },
     {
       "collapsed": false,
@@ -105,7 +53,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 8
+        "y": 2
       },
       "id": 7,
       "panels": [],
@@ -121,7 +69,7 @@
         "h": 10,
         "w": 5,
         "x": 0,
-        "y": 9
+        "y": 3
       },
       "id": 3,
       "options": {
@@ -147,7 +95,7 @@
         "h": 10,
         "w": 5,
         "x": 5,
-        "y": 9
+        "y": 3
       },
       "id": 2,
       "options": {
@@ -173,7 +121,7 @@
         "h": 10,
         "w": 5,
         "x": 10,
-        "y": 9
+        "y": 3
       },
       "id": 4,
       "options": {
@@ -199,7 +147,7 @@
         "h": 10,
         "w": 5,
         "x": 15,
-        "y": 9
+        "y": 3
       },
       "id": 5,
       "options": {
@@ -225,7 +173,7 @@
         "h": 10,
         "w": 4,
         "x": 20,
-        "y": 9
+        "y": 3
       },
       "id": 6,
       "options": {
@@ -248,7 +196,7 @@
         "h": 1,
         "w": 24,
         "x": 0,
-        "y": 19
+        "y": 13
       },
       "id": 8,
       "panels": [],
@@ -287,7 +235,7 @@
         "h": 9,
         "w": 5,
         "x": 0,
-        "y": 20
+        "y": 14
       },
       "id": 57,
       "options": {
@@ -360,7 +308,7 @@
         "h": 9,
         "w": 5,
         "x": 5,
-        "y": 20
+        "y": 14
       },
       "id": 10,
       "options": {
@@ -428,7 +376,7 @@
         "h": 9,
         "w": 5,
         "x": 10,
-        "y": 20
+        "y": 14
       },
       "id": 11,
       "options": {
@@ -473,7 +421,7 @@
         "h": 9,
         "w": 5,
         "x": 15,
-        "y": 20
+        "y": 14
       },
       "id": 12,
       "options": {
@@ -520,7 +468,7 @@
         "h": 9,
         "w": 4,
         "x": 20,
-        "y": 20
+        "y": 14
       },
       "id": 13,
       "options": {
@@ -546,7 +494,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "(($Energy * $EnergyCarbonIntensity * $PUE_avr_aws) + $Embodied)",
+          "expr": "(($Energy * $EnergyCarbonIntensity * $PUE_avr_aws) + ($__range_s/157766400)*sum(eks_node_embedded_value{node_name=~\".*\"})*1000)",
           "instant": false,
           "legendFormat": "__auto",
           "range": true,
@@ -587,7 +535,7 @@
         "h": 8,
         "w": 24,
         "x": 0,
-        "y": 29
+        "y": 23
       },
       "id": 58,
       "options": {
@@ -686,7 +634,7 @@
         "h": 9,
         "w": 24,
         "x": 0,
-        "y": 37
+        "y": 31
       },
       "id": 45,
       "options": {
@@ -719,7 +667,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "($Embodied / $SCI ) * 100",
+          "expr": "(($__range_s/157766400)*sum(eks_node_embedded_value{node_name=~\".*\"})*1000 / (($Energy * $EnergyCarbonIntensity * $PUE_avr_aws) + ($__range_s/157766400)*sum(eks_node_embedded_value{node_name=~\".*\"})*1000)) * 100",
           "instant": false,
           "legendFormat": "__auto",
           "range": true,
@@ -776,8 +724,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               },
               {
                 "color": "red",
@@ -792,7 +739,7 @@
         "h": 9,
         "w": 24,
         "x": 0,
-        "y": 46
+        "y": 40
       },
       "id": 47,
       "options": {
@@ -871,8 +818,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               },
               {
                 "color": "red",
@@ -887,7 +833,7 @@
         "h": 10,
         "w": 24,
         "x": 0,
-        "y": 55
+        "y": 49
       },
       "id": 46,
       "options": {
@@ -956,8 +902,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               },
               {
                 "color": "red",
@@ -972,7 +917,7 @@
         "h": 12,
         "w": 24,
         "x": 0,
-        "y": 65
+        "y": 59
       },
       "id": 50,
       "options": {
@@ -1043,7 +988,7 @@
         "h": 14,
         "w": 7,
         "x": 0,
-        "y": 77
+        "y": 71
       },
       "id": 42,
       "options": {
@@ -1129,8 +1074,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               },
               {
                 "color": "red",
@@ -1145,7 +1089,7 @@
         "h": 14,
         "w": 9,
         "x": 7,
-        "y": 77
+        "y": 71
       },
       "id": 44,
       "options": {
@@ -1167,7 +1111,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "sum(increase(\n          (kepler_container_joules_total{container_namespace=~\"$namespace\", pod_name=~\"$pod\"}[15m])\n      )\n   ) * $watt_per_second_to_kWh",
+          "expr": "sum(increase(\n          (kepler_container_joules_total{container_namespace=~\"$namespace\", pod_name=~\"$pod\"}[$__range])\n      )\n   ) * $watt_per_second_to_kWh",
           "instant": false,
           "legendFormat": "__auto",
           "range": true,
@@ -1193,8 +1137,7 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green",
-                "value": null
+                "color": "green"
               },
               {
                 "color": "red",
@@ -1209,7 +1152,7 @@
         "h": 14,
         "w": 5,
         "x": 16,
-        "y": 77
+        "y": 71
       },
       "id": 60,
       "options": {
@@ -1237,7 +1180,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "(($Energy * $EnergyCarbonIntensity * $PUE_avr_aws) + $Embodied)/122.72",
+          "expr": "(($Energy * $EnergyCarbonIntensity * $PUE_avr_aws) + (($Energy * $EnergyCarbonIntensity * $PUE_avr_aws) + ($__range_s/157766400)*sum(eks_node_embedded_value{node_name=~\".*\"})*1000))/122.72",
           "instant": false,
           "legendFormat": "__auto",
           "range": true,
@@ -1361,8 +1304,8 @@
         "allValue": "",
         "current": {
           "selected": false,
-          "text": "6.293338417858637",
-          "value": "6.293338417858637"
+          "text": "0.8361986153519422",
+          "value": "0.8361986153519422"
         },
         "datasource": {
           "type": "prometheus",
@@ -1390,8 +1333,8 @@
       {
         "current": {
           "selected": false,
-          "text": "338.9642857142858",
-          "value": "338.9642857142858"
+          "text": "451.75",
+          "value": "451.75"
         },
         "datasource": {
           "type": "prometheus",
@@ -1419,8 +1362,8 @@
       {
         "current": {
           "selected": false,
-          "text": "35.049288061336256",
-          "value": "35.049288061336256"
+          "text": "NaN",
+          "value": "NaN"
         },
         "datasource": {
           "type": "prometheus",
@@ -1428,7 +1371,7 @@
         },
         "definition": "query_result(scalar(($__range_s/$seconds_five_years)*sum(eks_node_embedded_value{node_name=~\".*\"})*1000))",
         "description": "gCO2eq",
-        "hide": 0,
+        "hide": 2,
         "includeAll": false,
         "label": "M",
         "multi": false,
@@ -1448,15 +1391,15 @@
       {
         "current": {
           "selected": false,
-          "text": "2456.2505394407053",
-          "value": "2456.2505394407053"
+          "text": "NaN",
+          "value": "NaN"
         },
         "datasource": {
           "type": "prometheus",
           "uid": "prometheus"
         },
         "definition": "query_result((($Energy * $EnergyCarbonIntensity * $PUE_avr_aws) + $Embodied))",
-        "hide": 0,
+        "hide": 2,
         "includeAll": false,
         "multi": false,
         "name": "SCI",

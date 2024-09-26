@@ -29,7 +29,7 @@
       },
       "gridPos": {
         "h": 2,
-        "w": 2,
+        "w": 3,
         "x": 0,
         "y": 0
       },
@@ -430,7 +430,7 @@
           "showLineNumbers": false,
           "showMiniMap": false
         },
-        "content": "TODO: Add info on functional unit of EKS",
+        "content": "The whole EKS cluster",
         "mode": "markdown"
       },
       "pluginVersion": "11.1.0",
@@ -724,7 +724,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               },
               {
                 "color": "red",
@@ -818,7 +819,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               },
               {
                 "color": "red",
@@ -902,7 +904,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               },
               {
                 "color": "red",
@@ -1304,8 +1307,8 @@
         "allValue": "",
         "current": {
           "selected": false,
-          "text": "0.8361986153519422",
-          "value": "0.8361986153519422"
+          "text": "0.2098327064955918",
+          "value": "0.2098327064955918"
         },
         "datasource": {
           "type": "prometheus",
@@ -1333,8 +1336,8 @@
       {
         "current": {
           "selected": false,
-          "text": "451.75",
-          "value": "451.75"
+          "text": "278",
+          "value": "278"
         },
         "datasource": {
           "type": "prometheus",
@@ -1362,8 +1365,8 @@
       {
         "current": {
           "selected": false,
-          "text": "NaN",
-          "value": "NaN"
+          "text": "26.28696604600219",
+          "value": "26.28696604600219"
         },
         "datasource": {
           "type": "prometheus",
@@ -1391,8 +1394,8 @@
       {
         "current": {
           "selected": false,
-          "text": "NaN",
-          "value": "NaN"
+          "text": "92.49547992655627",
+          "value": "92.49547992655627"
         },
         "datasource": {
           "type": "prometheus",
@@ -1418,13 +1421,13 @@
     ]
   },
   "time": {
-    "from": "now-2d",
+    "from": "now-12h",
     "to": "now"
   },
   "timepicker": {},
   "timezone": "",
   "title": "Carbon intensity EKS - KEIT (Ierland)",
   "uid": "babfe92a-42e3-45fd-baf1-ea503e23fca6",
-  "version": 4,
+  "version": 6,
   "weekStart": ""
 }

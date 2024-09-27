@@ -1,0 +1,14 @@
+prometheus:
+  prometheusSpec:
+    retention: "14d"
+    tsdb:
+      outOfOrderTimeWindow: 3h
+    storageSpec:
+      volumeClaimTemplate:
+        spec:
+          storageClassName: ebs-sc
+          accessModes:
+            - ReadWriteOnce
+          resources:
+            requests:
+              storage: 50Gi

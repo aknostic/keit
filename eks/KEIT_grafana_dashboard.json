@@ -18,7 +18,6 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "id": 29,
   "links": [],
   "liveNow": false,
   "panels": [
@@ -334,7 +333,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "avg_over_time(grid_intensity_carbon_average{is_estimated=\"true\"}[$__range])",
+          "expr": "avg(avg_over_time(grid_intensity_carbon_average{is_estimated=\"true\"}[$__range]))",
           "instant": false,
           "legendFormat": "__auto",
           "range": true,
@@ -1077,7 +1076,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               },
               {
                 "color": "red",
@@ -1140,7 +1140,8 @@
             "mode": "absolute",
             "steps": [
               {
-                "color": "green"
+                "color": "green",
+                "value": null
               },
               {
                 "color": "red",
@@ -1307,8 +1308,8 @@
         "allValue": "",
         "current": {
           "selected": false,
-          "text": "0.2098327064955918",
-          "value": "0.2098327064955918"
+          "text": "28.216612852815974",
+          "value": "28.216612852815974"
         },
         "datasource": {
           "type": "prometheus",
@@ -1336,14 +1337,14 @@
       {
         "current": {
           "selected": false,
-          "text": "278",
-          "value": "278"
+          "text": "384.11750374812596",
+          "value": "384.11750374812596"
         },
         "datasource": {
           "type": "prometheus",
           "uid": "prometheus"
         },
-        "definition": "query_result(scalar(avg_over_time(grid_intensity_carbon_average{is_estimated=\"true\"}[$__range])))",
+        "definition": "query_result(scalar(avg(avg_over_time(grid_intensity_carbon_average{is_estimated=\"true\"}[$__range]))))",
         "description": "gCO2e/kWh",
         "hide": 0,
         "includeAll": false,
@@ -1353,7 +1354,7 @@
         "options": [],
         "query": {
           "qryType": 3,
-          "query": "query_result(scalar(avg_over_time(grid_intensity_carbon_average{is_estimated=\"true\"}[$__range])))",
+          "query": "query_result(scalar(avg(avg_over_time(grid_intensity_carbon_average{is_estimated=\"true\"}[$__range]))))",
           "refId": "PrometheusVariableQueryEditor-VariableQuery"
         },
         "refresh": 2,
@@ -1365,8 +1366,8 @@
       {
         "current": {
           "selected": false,
-          "text": "26.28696604600219",
-          "value": "26.28696604600219"
+          "text": "NaN",
+          "value": "NaN"
         },
         "datasource": {
           "type": "prometheus",
@@ -1394,8 +1395,8 @@
       {
         "current": {
           "selected": false,
-          "text": "92.49547992655627",
-          "value": "92.49547992655627"
+          "text": "NaN",
+          "value": "NaN"
         },
         "datasource": {
           "type": "prometheus",
@@ -1428,6 +1429,6 @@
   "timezone": "",
   "title": "Carbon intensity EKS - KEIT (Ierland)",
   "uid": "babfe92a-42e3-45fd-baf1-ea503e23fca6",
-  "version": 6,
+  "version": 1,
   "weekStart": ""
 }

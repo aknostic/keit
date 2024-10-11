@@ -199,7 +199,7 @@
       },
       "id": 8,
       "panels": [],
-      "title": "Software Carbon Intensity (SCI) index of host cluster hetzner",
+      "title": "Software Carbon Intensity (SCI) index of KEIT EKS cluster",
       "type": "row"
     },
     {
@@ -1184,7 +1184,7 @@
             "uid": "prometheus"
           },
           "editorMode": "code",
-          "expr": "(($Energy * $EnergyCarbonIntensity * $PUE_avr_aws) + (($Energy * $EnergyCarbonIntensity * $PUE_avr_aws) + ($__range_s/157766400)*sum(eks_node_embedded_value{node_name=~\".*\"})*1000))/122.72",
+          "expr": "((($Energy * $EnergyCarbonIntensity * $PUE_avr_aws) + ($__range_s/157766400)*sum(eks_node_embedded_value{node_name=~\".*\"})*1000))/122.72",
           "instant": false,
           "legendFormat": "__auto",
           "range": true,
@@ -1308,8 +1308,8 @@
         "allValue": "",
         "current": {
           "selected": false,
-          "text": "28.216612852815974",
-          "value": "28.216612852815974"
+          "text": "78.82752845864488",
+          "value": "78.82752845864488"
         },
         "datasource": {
           "type": "prometheus",
@@ -1337,8 +1337,8 @@
       {
         "current": {
           "selected": false,
-          "text": "384.11750374812596",
-          "value": "384.11750374812596"
+          "text": "419.10397074190183",
+          "value": "419.10397074190183"
         },
         "datasource": {
           "type": "prometheus",
@@ -1366,8 +1366,8 @@
       {
         "current": {
           "selected": false,
-          "text": "NaN",
-          "value": "NaN"
+          "text": "613.3625410733844",
+          "value": "613.3625410733844"
         },
         "datasource": {
           "type": "prometheus",
@@ -1395,8 +1395,8 @@
       {
         "current": {
           "selected": false,
-          "text": "NaN",
-          "value": "NaN"
+          "text": "38110.27829626815",
+          "value": "38110.27829626815"
         },
         "datasource": {
           "type": "prometheus",
@@ -1422,13 +1422,13 @@
     ]
   },
   "time": {
-    "from": "now-12h",
+    "from": "now-14d",
     "to": "now"
   },
   "timepicker": {},
   "timezone": "",
   "title": "Carbon intensity EKS - KEIT (Ierland)",
   "uid": "babfe92a-42e3-45fd-baf1-ea503e23fca6",
-  "version": 1,
+  "version": 2,
   "weekStart": ""
 }

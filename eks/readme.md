@@ -41,6 +41,7 @@ Get the pod to run in the cluster:
 
 ```
 kubectl apply -f keit_deployment.yaml
+kubectl apply -f keit_service.yaml
 ```
 
 Add the role bindings otherwise we the keit.go does not have access to readout all the pods on and all the nodes (runs only in keit namespace):

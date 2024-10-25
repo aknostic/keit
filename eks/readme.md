@@ -21,7 +21,7 @@ With docker images, you will find the new keit image.
 now tag it and push it to ecr.
 ```
 docker tag keit 623566434957.dkr.ecr.eu-west-1.amazonaws.com/keit:latest
-aws aws ecr get-login-password --region eu-west-1 | docker login --username AWS --password-stdin 623566434957.dkr.ecr.eu-west-1.amazonaws.com
+aws ecr get-login-password --region eu-west-1 | docker login --username AWS --password-stdin 623566434957.dkr.ecr.eu-west-1.amazonaws.com
 docker push 623566434957.dkr.ecr.eu-west-1.amazonaws.com/keit:latest
 ```
 -----

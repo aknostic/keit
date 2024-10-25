@@ -29,6 +29,7 @@ docker push 623566434957.dkr.ecr.eu-west-1.amazonaws.com/keit:latest
 
 via deployment
 ```
+kubectl create namespace keit
 kubectl apply -f deployment_boavizta.yaml
 ```
 This local pod is used by keit to get the embodied carbon of the servers
@@ -39,7 +40,6 @@ This local pod is used by keit to get the embodied carbon of the servers
 Get the pod to run in the cluster:
 
 ```
-kubectl create namespace keit
 kubectl apply -f keit_deployment.yaml
 ```
 

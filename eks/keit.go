@@ -84,6 +84,9 @@ func getEmbeddedValue(instanceType string) (float64, error) {
 }
 
 func recordMetrics(clientset *kubernetes.Clientset) {
+        // Reset the gauge to clear out any previously recorded metrics
+        embeddedValueGauge.Reset()
+
 	// Create a map to store instance type per node to avoid repeated API calls
 	nodeInstanceTypeMap := make(map[string]string)
 	// Create a map to store embedded values for each instance type

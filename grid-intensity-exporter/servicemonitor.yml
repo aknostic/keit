@@ -1,0 +1,20 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: grid-intensity-service-monitor
+  namespace: grid-intensity
+  labels:
+    app.kubernetes.io/name: grid-intensity-exporter
+spec:
+  endpoints:
+    - path: /metrics
+      port: metrics
+      scheme: http
+      interval: 5m
+      scrapeTimeout: 2m
+  namespaceSelector:
+    matchNames:
+      [ grid-intensity ]
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: grid-intensity-exporter

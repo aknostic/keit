@@ -1,0 +1,14 @@
+image:
+  # (naming might look a bit weird, but it's Scaleway container registry:)
+  repository: rg.fr-par.scw.cloud/funcscwtgwfiljyy2ym/grid-intensity
+  tag: latest
+  pullPolicy: IfNotPresent
+
+gridIntensity:
+  provider: ElectricityMaps
+  location: <REPLACE-WITH-YOUR-SELECTED-ZONE>
+
+# Get API token from https://electricitymaps.com/
+electricityMap:
+  apiToken: <REPLACE-WITH-YOUR-API-TOKEN>
+  apiURL: https://api-access.electricitymaps.com/free-tier/

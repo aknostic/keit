@@ -14,6 +14,9 @@ KEIT uses other open source projects to accomplish this:
 
 This means that to use KEIT you will need to install a few software components.
 
+![KEIT components](/images/keit-components.png)
+
+
 ## Installation
 
 The installation instructions assume you have a Kubernetes cluster up and running and that you can access it via `kubectl` command line.
@@ -161,4 +164,19 @@ For example:
 - [Azure](https://azure.microsoft.com/en-us/blog/how-microsoft-measures-datacenter-water-and-energy-use-to-improve-azure-cloud-sustainability/) reports a PUE of 1.185 in Europe
 - Scaleway reports a PUE of 1.37
 - And so on...
+
+
+### Get embodied emissions
+
+The embodied emissions of the hardware running your cluster can be estimated using [Boavizta](https://boavizta.org/).
+
+If you are running on AWS, KEIT runs the Boavizta API in your cluster to dynamically retrieve the embodied emissions of the instances that you are running. In that way, you can use something like Karpenter or Kubernetes Autoscaler to adjust the size of your cluster dynamically and KEIT will retrieve the embodied emissions accordingly.
+
+#### Running on AWS EKS (dynamic)
+
+
+
+#### Running everywhere else (static)
+
+We have plans to implement the same logic as above for Azure, but for the time being the solution on other cloud providers or data centers is to calculate the embodied emissions using [Datavizta](https://datavizta.boavizta.org/serversimpact), entering the data about your hardware.
 

@@ -18,3 +18,8 @@ boavizta:
     tag: latest
     pullPolicy: Always
   replicaCount: 1
+
+servicemonitor:
+  enabled: true
+  interval: 15m
+  scrapeTimeout: 2m

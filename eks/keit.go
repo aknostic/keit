@@ -1,4 +1,4 @@
-package main
+p -ckage main
 
 import (
 	"encoding/json"
@@ -57,7 +57,7 @@ func init() {
 
 // Function to call Boavizta API and get the embedded value
 func getEmbeddedValue(instanceType string) (float64, error) {
-	url := fmt.Sprintf("http://boavizta-service:5000/v1/cloud/instance?provider=aws&instance_type=%s&verbose=false&duration=43800&criteria=gwp", instanceType)
+	url := fmt.Sprintf("http://boaviztapi-service:5000/v1/cloud/instance?provider=aws&instance_type=%s&verbose=false&duration=43800&criteria=gwp", instanceType)
 
 	resp, err := http.Get(url)
 	if err != nil {

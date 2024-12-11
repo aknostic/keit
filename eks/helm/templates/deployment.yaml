@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ .Release.Name }}-keit-deployment
+  name: keit-deployment
   namespace: {{ .Values.namespace }}
 spec:
   replicas: {{ .Values.replicaCount }}

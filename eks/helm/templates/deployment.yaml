@@ -1,0 +1,22 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .Release.Name }}-keit-deployment
+  namespace: {{ .Values.namespace }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      app: keit-app
+  template:
+    metadata:
+      labels:
+        app: keit-app
+    spec:
+      containers:
+      - name: keit-app-container
+        image: ghcr.io/aknostic/keit:latest 
+        imagePullPolicy: {{ .Values.image.pullPolicy }}
+        ports:
+        - containerPort: 8080
+

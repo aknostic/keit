@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: boaviztapi
+  namespace: {{ .Values.namespace }} 
+  labels:
+    app: boaviztapi
+spec:
+  replicas: {{ .Values.boavizta.replicaCount }}  # Number of pods to run
+  selector:
+    matchLabels:
+      app: boaviztapi
+  template:
+    metadata:
+      labels:
+        app: boaviztapi
+    spec:
+      containers:
+      - name: boaviztapi-container
+        image: ghcr.io/boavizta/boaviztapi:latest   # Docker image to run
+        ports:
+        - containerPort: 5000  # Exposing port 5000 on the container
+        # Define resource requests and limits if needed
+        resources:
+          requests:
+            memory: "256Mi"
+            cpu: "500m"
+          limits:
+            memory: "512Mi"
+            cpu: "1000m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: boaviztapi-service
+  namespace: {{ .Values.namespace }}
+  labels:
+    app: boaviztapi
+spec:
+  type: ClusterIP  # The service is only accessible within the cluster
+  ports:
+    - port: 5000  # The port that other pods will use to access the service
+      targetPort: 5000  # The port on the container that the traffic will be directed to
+  selector:
+    app: boaviztapi
+

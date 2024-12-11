@@ -1,0 +1,6 @@
+apiVersion: v2
+name: keit
+description: A Helm chart for deploying keit-app and boavizta-app in the keit namespace
+type: application
+version: 0.2.0
+appVersion: 1.0.0

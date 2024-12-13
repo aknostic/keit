@@ -197,4 +197,5 @@ eks_node_embedded_value{instance_type="m5a.large",node_name="ip-10-12-16-152.eu-
 
 We have plans to implement the same logic as above for Azure, but for the time being the solution on other cloud providers or data centers is to calculate the embodied emissions using [Datavizta](https://datavizta.boavizta.org/serversimpact), entering the data about your hardware.
 
-Note: We would like to add support to Azure and maybe GCP when there are users of KEIT who need it.
+Note: We want like to add support to Azure and maybe GCP.
+

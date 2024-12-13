@@ -84,11 +84,11 @@ curl -s http://localhost:8080/metrics
 ```
 -----
 # Keit
-![keit](https://github.com/user-attachments/assets/cd6fe0e3-19e5-4331-b239-d5a48661b763)
+![keit](images/keit.png)
 # grid-intensity
-![monitoring](https://github.com/user-attachments/assets/adfed41b-b38a-4363-a3f9-33f2fcd328b6)
+![monitoring](images/monitoring.png)
 # Kepler
-![kepler](https://github.com/user-attachments/assets/ac71ed3a-1005-4b27-8baa-fe08cb0cfebb)
+![kepler](images/kepler.png)
 # prometheus
-![prometheus](https://github.com/user-attachments/assets/47f8b0dd-1cd8-4e16-86c7-98e7b8cdb5ff)
+![prometheus](images/prometheus.png)
 

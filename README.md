@@ -152,20 +152,6 @@ git clone git@github.com:thegreenwebfoundation/grid-intensity-go.git
 helm install -n grid-intensity -f keit/grid-intensity-exporter/values.yaml grid-intensity-exporter grid-intensity-go/helm/grid-intensity-exporter
 ```
 
-### Find or estimate the PUE of the data center
-
-The [PUE](https://www.cloudcarbonfootprint.org/docs/methodology/#power-usage-effectiveness) (Power Usage Effectiveness) of a data center or cloud provider is a score of how energy efficient a data center is, with the lowest possible score of 1 meaning all energy consumed goes directly to powering the servers and none is being wasted on cooling.
-
-Find the PUE of your cloud provider or data center publicly available, or ask the number to your data center.
-
-For example:
-- For example, [AWS](https://sustainability.aboutamazon.com/products-services/aws-cloud) in Ireland reports a very low PUE of 1.10
-- For example, [GCP](https://www.google.com/about/datacenters/efficiency/) in Ireland reports even lower PUE of 1.08
-- [Azure](https://azure.microsoft.com/en-us/blog/how-microsoft-measures-datacenter-water-and-energy-use-to-improve-azure-cloud-sustainability/) reports a PUE of 1.185 in Europe
-- [Scaleway](https://www.scaleway.com/en/environmental-leadership/) reports a PUE of 1.37
-- And so on, look for your provider published value on PUE, of if not available ask them for it.
-
-
 ### Get embodied emissions
 
 The embodied emissions of the hardware running your cluster can be estimated using [Boavizta](https://boavizta.org/).
@@ -198,4 +184,27 @@ eks_node_embedded_value{instance_type="m5a.large",node_name="ip-10-12-16-152.eu-
 We have plans to implement the same logic as above for Azure, but for the time being the solution on other cloud providers or data centers is to calculate the embodied emissions using [Datavizta](https://datavizta.boavizta.org/serversimpact), entering the data about your hardware.
 
 Note: We want like to add support to Azure and maybe GCP.
+
+### Create the Grafana dashboard
+
+#### Find or estimate the PUE of the data center
+
+The [PUE](https://www.cloudcarbonfootprint.org/docs/methodology/#power-usage-effectiveness) (Power Usage Effectiveness) of a data center or cloud provider is a score of how energy efficient a data center is, with the lowest possible score of 1 meaning all energy consumed goes directly to powering the servers and none is being wasted on cooling.
+
+Find the PUE of your cloud provider or data center publicly available, or ask the number to your data center.
+
+For example:
+- For example, [AWS](https://sustainability.aboutamazon.com/products-services/aws-cloud) in Ireland reports a very low PUE of 1.10
+- For example, [GCP](https://www.google.com/about/datacenters/efficiency/) in Ireland reports even lower PUE of 1.08
+- [Azure](https://azure.microsoft.com/en-us/blog/how-microsoft-measures-datacenter-water-and-energy-use-to-improve-azure-cloud-sustainability/) reports a PUE of 1.185 in Europe
+- [Scaleway](https://www.scaleway.com/en/environmental-leadership/) reports a PUE of 1.37
+- And so on, look for your provider published value on PUE, of if not available ask them for it.
+
+#### Create the Grafana dashboard
+
+The KEIT Grafana dashboard definition is in the repository, KEIT_grafana_dashboard.json.
+
+Update the PUE to your value and then import it to Grafana.
+
+You can access Grafana by port forwarding:
 

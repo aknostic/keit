@@ -2,7 +2,7 @@ apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
   name: keit-servicemonitor
-  namespace: {{ .Values.namespace }}
+  namespace: {{ .Release.Namespace }}
   labels:
     app.kubernetes.io/name: keit-servicemonitor
     release: prometheus 
@@ -12,7 +12,7 @@ spec:
       app: keit-service
   namespaceSelector:
     matchNames:
-    - {{ .Values.namespace }}
+    - {{ .Release.Namespace }}
   endpoints:
     - port: metrics
       path: /metrics

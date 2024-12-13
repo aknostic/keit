@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: boaviztapi
-  namespace: {{ .Values.namespace }} 
+  namespace: {{ .Release.Namespace }} 
   labels:
     app: boaviztapi
 spec:
@@ -33,7 +33,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: boaviztapi-service
-  namespace: {{ .Values.namespace }}
+  namespace: {{ .Release.Namespace }}
   labels:
     app: boaviztapi
 spec:

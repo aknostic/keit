@@ -162,8 +162,8 @@ For example:
 - For example, [AWS](https://sustainability.aboutamazon.com/products-services/aws-cloud) in Ireland reports a very low PUE of 1.10
 - For example, [GCP](https://www.google.com/about/datacenters/efficiency/) in Ireland reports even lower PUE of 1.08
 - [Azure](https://azure.microsoft.com/en-us/blog/how-microsoft-measures-datacenter-water-and-energy-use-to-improve-azure-cloud-sustainability/) reports a PUE of 1.185 in Europe
-- Scaleway reports a PUE of 1.37
-- And so on...
+- [Scaleway](https://www.scaleway.com/en/environmental-leadership/) reports a PUE of 1.37
+- And so on, look for your provider published value on PUE, of if not available ask them for it.
 
 
 ### Get embodied emissions
@@ -172,11 +172,29 @@ The embodied emissions of the hardware running your cluster can be estimated usi
 
 If you are running on AWS, KEIT runs the Boavizta API in your cluster to dynamically retrieve the embodied emissions of the instances that you are running. In that way, you can use something like Karpenter or Kubernetes Autoscaler to adjust the size of your cluster dynamically and KEIT will retrieve the embodied emissions accordingly.
 
-#### Running on AWS EKS (dynamic)
+#### If you are running on AWS EKS (dynamic)
 
+Install the helm chart:
 
+```bash
+helm install --namespace keit -f eks/helm/values.yaml keit-boavizta-exporter eks/helm --create-namespace
+```
 
-#### Running everywhere else (static)
+And you can test that the Boavizta exporter is running:
+```bash
+kubectl port-forward svc/keit-service 8080:8080 -n keit &
+curl localhost:8080/metrics | grep embedded
+# HELP eks_node_embedded_value The embedded value of AWS instance types running in the EKS cluster.
+# TYPE eks_node_embedded_value gauge
+eks_node_embedded_value{instance_type="c5.4xlarge",node_name="ip-10-12-48-197.eu-west-1.compute.internal"} 130
+eks_node_embedded_value{instance_type="c5.4xlarge",node_name="ip-10-12-58-56.eu-west-1.compute.internal"} 130
+eks_node_embedded_value{instance_type="c5.large",node_name="ip-10-12-68-90.eu-west-1.compute.internal"} 16
+eks_node_embedded_value{instance_type="m5a.large",node_name="ip-10-12-16-152.eu-west-1.compute.internal"} 19
+...
+```
+
+#### If you are running anywhere else (static)
 
 We have plans to implement the same logic as above for Azure, but for the time being the solution on other cloud providers or data centers is to calculate the embodied emissions using [Datavizta](https://datavizta.boavizta.org/serversimpact), entering the data about your hardware.
 
+Note: We would like to add support to Azure and maybe GCP when there are users of KEIT who need it.

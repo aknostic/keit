@@ -208,3 +208,6 @@ Update the PUE to your value and then import it to Grafana.
 
 You can access Grafana by port forwarding:
 
+```bash
+kubectl port-forward svc/kube-prometheus-stack-grafana 8082:80 -n monitoring &
+```

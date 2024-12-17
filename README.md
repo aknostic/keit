@@ -1,6 +1,6 @@
 # KEIT - Kubernetes Emissions Insights Tool
 
-KEIT is an open source tool which estimates the carbon emissions of a Kubernetes cluster. We have tested it on Kubernetes on bare metal and adapted to EKS and we are working on adapting it to work on Azure.
+KEIT is an open source tool which estimates the carbon emissions of a Kubernetes cluster. We have tested it on Kubernetes on bare metal and adapted to AWS' EKS and we are working on adapting it to work on Azure.
 
 KEIT uses other open source projects to accomplish this:
 

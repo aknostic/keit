@@ -46,45 +46,10 @@ Note: Classic github token, needs presmissions on: All repo + write packages + d
 
 ***
 
-## Deploy boavizta:
-
-via deployment
-
+## Deploy KEIT:
 ```
-kubectl create namespace keit
-kubectl apply -f deployment_boavizta.yaml
+helm install --namespace keit -f eks/helm/values.yaml keit-boavizta-exporter eks/helm --create-namespace
 ```
-
-This local pod is used by keit to get the embodied carbon of the servers
-
-***
-
-## Deploy keit:
-
-Get the pod to run in the cluster:
-
-```
-kubectl apply -f keit_deployment.yaml
-kubectl apply -f keit_service.yaml
-kubectl apply -f keit_servicemonitor.yaml
-```
-
-Add the role bindings otherwise we the keit.go does not have access to readout all the pods on and all the nodes (runs only in keit namespace):
-
-for the pods:
-
-```
-kubectl apply -f clusterrole.yaml
-kubectl apply -f clusterrolebinding.yaml
-```
-
-for the nodes:
-
-```
-kubectl apply -f clusterrole-node-reader.yaml
-kubectl apply -f clusterrolebinding-node-reader.yaml
-```
-
 ***
 
 ## Usage, examples:

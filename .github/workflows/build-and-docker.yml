@@ -53,13 +53,7 @@ jobs:
           CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o keit .
           docker build -t keit:${{ env.version }} .
 
-      # Step 5: push to github packages 
-      - name: Await manual approval
-        uses: peter-evans/repository-dispatch@v2
-        with:
-          event-type: manual-approval
-
-      # Step 1: Push Docker image to GitHub Container Registry
+      # Step 5: Push Docker image to GitHub Container Registry
       - name: Push Docker image to GitHub Container Registry
         run: |
           echo "${{ secrets.GTH_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin

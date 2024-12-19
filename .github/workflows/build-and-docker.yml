@@ -22,6 +22,7 @@ jobs:
         uses: actions/setup-go@v4
         with:
           go-version: 1.23
+        working-directory: eks
 
       # Step 3: Read and increment version
       - name: Increment version
@@ -47,7 +48,6 @@ jobs:
         run: |
           ls -al eks/
           cat eks/go.sum
-
 
       # Step 4 set cache file dir
       - name: Cache Go modules

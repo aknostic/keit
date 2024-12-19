@@ -62,11 +62,14 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GTH_TOKEN }}
 
+
       # Step 6: Push Docker image to GitHub Container Registry
       - name: Push Docker image to GitHub Container Registry
         run: |
+          docker tag ghcr.io/${{ github.repository }}/keit:${{ env.version }} ghcr.io/${{ github.repository }}/keit:latest
           docker tag keit:${{ env.version }} ghcr.io/aknostic/keit:${{ env.version }}
           docker push ghcr.io/aknostic/keit:${{ env.version }}
+          docker push ghcr.io/${{ github.repository }}/keit:latest
 
       # Step 7: Commit updated version file
       - name: Commit and push updated version

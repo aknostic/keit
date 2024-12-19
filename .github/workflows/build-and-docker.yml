@@ -26,6 +26,7 @@ jobs:
       # Step 3: Install dependencies
       - name: Install Go dependencies
         run: |
+          cd eks
           go mod tidy
 
       # Step 4: Build Go application

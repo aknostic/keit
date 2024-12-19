@@ -68,3 +68,13 @@ jobs:
           docker tag keit:${{ env.version }} ghcr.io/aknostic/keit:${{ env.version }}
           docker push ghcr.io/aknostic/keit:${{ env.version }}
 
+      # Step 7: Commit updated version file
+      - name: Commit and push updated version
+        run: |
+          git config --local user.name "GitHub Actions"
+          git config --local user.email "actions@github.com"
+          git add eks/VERSION
+          git commit -m "Bump version to ${{ env.version }}"
+          git push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

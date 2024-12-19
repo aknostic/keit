@@ -57,6 +57,6 @@ jobs:
       - name: Push Docker image to GitHub Container Registry
         run: |
           echo "${{ secrets.GTH_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
-          docker tag keit:${{ env.version }} ghcr.io/${{ github.repository }}/keit:${{ env.version }}
-          docker push ghcr.io/${{ github.repository }}/keit:${{ env.version }}
+          docker tag keit:${{ env.version }} ghcr.io/keit:${{ env.version }}
+          docker push ghcr.io/keit:${{ env.version }}
 

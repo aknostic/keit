@@ -30,15 +30,10 @@ jobs:
           go mod init keit
           go mod tidy
           go build -o keit . 
-
-
-      # Step 4: Build Docker image
-      - name: Build Docker image
-        run: |
           CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o keit .
           docker build -t keit .
 
-      # Step 5: Push Docker image to a github package TODO 
+      # Step 4: Push Docker image to a github package TODO 
       # - name: Push Docker image to Docker Hub
       #  run: |
       #    docker tag keit:${{ github.sha }} your-dockerhub-username/keit:${{ github.sha }}

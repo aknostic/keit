@@ -1,0 +1,45 @@
+name: Build and Dockerize KIET Go Application
+
+on:
+  push:
+    branches:
+      - main  # Run the workflow on pushes to the main branch
+  pull_request:
+    branches:
+      - main  # Run the workflow on pull requests targeting the main branch
+
+jobs:
+  build-and-dockerize:
+    runs-on: ubuntu-latest
+
+    steps:
+      # Step 1: Checkout the code
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Step 2: Set up Go environment
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: 1.23
+
+      # Step 3: Install dependencies
+      - name: Install Go dependencies
+        run: |
+          go mod tidy
+
+      # Step 4: Build Go application
+      - name: Build Go application
+        run: |
+          CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o keit .
+
+      # Step 5: Build Docker image
+      - name: Build Docker image
+        run: |
+          docker build -t keit .
+
+      # Step 6: Push Docker image to a github package TODO 
+      # - name: Push Docker image to Docker Hub
+      #  run: |
+      #    docker tag keit:${{ github.sha }} your-dockerhub-username/keit:${{ github.sha }}
+      #    docker push your-dockerhub-username/keit:${{ github.sha }}

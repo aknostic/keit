@@ -68,7 +68,6 @@ jobs:
           docker tag keit:${{ env.version }} ghcr.io/aknostic/keit:${{ env.version }}
           docker tag keit:latest ghcr.io/aknostic/keit:latest
           docker push ghcr.io/aknostic/keit:${{ env.version }}
-          docker push ghcr.io/aknostic/keit:latest
 
       # Step 7: Commit updated version file
       - name: Commit and push updated version

@@ -24,23 +24,21 @@ jobs:
           go-version: 1.23
 
       # Step 3: Install dependencies
-      - name: Install Go dependencies
+      - name: Install Go dependencies and build
         run: |
           cd eks
           go mod init keit
           go mod tidy
+          go build -o keit . 
 
-      # Step 4: Build Go application
-      - name: Build Go application
-        run: |
-          CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o keit .
 
-      # Step 5: Build Docker image
+      # Step 4: Build Docker image
       - name: Build Docker image
         run: |
+          CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o keit .
           docker build -t keit .
 
-      # Step 6: Push Docker image to a github package TODO 
+      # Step 5: Push Docker image to a github package TODO 
       # - name: Push Docker image to Docker Hub
       #  run: |
       #    docker tag keit:${{ github.sha }} your-dockerhub-username/keit:${{ github.sha }}

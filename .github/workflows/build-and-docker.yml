@@ -66,10 +66,15 @@ jobs:
       - name: Push Docker image to GitHub Container Registry
         run: |
           docker tag keit:${{ env.version }} ghcr.io/aknostic/keit:${{ env.version }}
-          docker tag keit:latest ghcr.io/aknostic/keit:latest
           docker push ghcr.io/aknostic/keit:${{ env.version }}
 
-      # Step 7: Commit updated version file
+      # Step 7: Add and push 'latest' tag
+      - name: Push Docker image with latest tag
+        run: |
+          docker tag keit:${{ env.version }} ghcr.io/aknostic/keit:latest
+          docker push ghcr.io/aknostic/keit:latest
+
+      # Step 8: Commit updated version file
       - name: Commit and push updated version
         run: |
           git config --local user.name "GitHub Actions"

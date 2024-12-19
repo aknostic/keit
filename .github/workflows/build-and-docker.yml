@@ -47,7 +47,6 @@ jobs:
       - name: Install Go dependencies and build
         run: |
           cd eks
-          go mod init keit
           go mod tidy
           go build -o keit .
           CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o keit .

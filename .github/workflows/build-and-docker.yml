@@ -10,7 +10,7 @@ on:
 
 jobs:
   build-and-dockerize:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-24.04
 
     steps:
       # Step 1: Checkout the code
@@ -42,6 +42,12 @@ jobs:
           # Write the new version to the file
           echo "$NEW_VERSION" > $VERSION_FILE
           echo "version=$NEW_VERSION" >> $GITHUB_ENV
+
+      - name: Debug Check go.sum location
+        run: |
+          ls -al eks/
+          cat eks/go.sum
+
 
       # Step 4 set cache file dir
       - name: Cache Go modules

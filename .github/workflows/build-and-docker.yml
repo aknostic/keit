@@ -46,11 +46,11 @@ jobs:
       # Step 4 set cache file dir
       - name: Cache Go modules
         uses: actions/cache@v3
-	with:
-	  path: ~/go/pkg/mod
-	  key: ${{ runner.os }}-go-${{ hashFiles('eks/go.sum') }}
-	  restore-keys: |
-	    ${{ runner.os }}-go-
+        with:
+          path: ~/go/pkg/mod
+          key: ${{ runner.os }}-go-${{ hashFiles('eks/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
 
       # Step 5: Install dependencies
       - name: Install Go dependencies and build

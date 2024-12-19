@@ -19,10 +19,11 @@ jobs:
 
       # Step 2: Set up Go environment
       - name: Set up Go
-        uses: actions/setup-go@v4
+        uses: actions/setup-go@v5
         with:
           go-version: 1.23
-        working-directory: eks
+          cache-dependency-path: |
+             eks/go.sum
 
       # Step 3: Read and increment version
       - name: Increment version

@@ -10,42 +10,6 @@ eksctl create cluster -f cluster-config.yaml
 
 ***
 
-## Build keit:
-
-```
-go mod init keit
-go mod tidy
-
-go build -o keit .   
-
-CGO_ENABLED=0 GOOS=linux go build -o keit .
-docker build -t keit .
-```
-
-With docker images, you will find the new keit image. now tag it and push it to ecr.
-
-```
-docker tag keit 623566434957.dkr.ecr.eu-west-1.amazonaws.com/keit:latest
-aws ecr get-login-password --region eu-west-1 | docker login --username AWS --password-stdin 623566434957.dkr.ecr.eu-west-1.amazonaws.com
-docker push 623566434957.dkr.ecr.eu-west-1.amazonaws.com/keit:latest
-```
-
-Other option is to store it in github packages of aknostic (probably we will remove ecr 20241213):
-
-```
-docker tag keit ghcr.io/aknostic/keit:<version>
-CR_PAT=<your github token> 
-echo $CR_PAT | docker login ghcr.io -u USERNAME --password-stdin
-docker push ghcr.io/aknostic/keit:<version>
-docker logout
-
-(set latest to just added version, if needed)
-```
-
-Note: Classic github token, needs presmissions on: All repo + write packages + delete.&#x20;
-
-***
-
 ## Deploy KEIT:
 ```
 helm install --namespace keit -f eks/helm/values.yaml keit-boavizta-exporter eks/helm --create-namespace

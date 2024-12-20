@@ -1,5 +1,8 @@
 name: Build and Dockerize KIET Go Application
 
+permissions:
+  contents: write
+
 on:
   workflow_dispatch:  # Allows manual triggering of the workflow
 

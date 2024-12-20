@@ -1,12 +1,7 @@
 name: Build and Dockerize KIET Go Application
 
 on:
-  push:
-    branches:
-      - main  # Run the workflow on pushes to the main branch
-  pull_request:
-    branches:
-      - main  # Run the workflow on pull requests targeting the main branch
+  workflow_dispatch:  # Allows manual triggering of the workflow
 
 jobs:
   build-and-dockerize:

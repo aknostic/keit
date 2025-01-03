@@ -18,14 +18,14 @@ jobs:
         with:
           go-version: 1.23
           cache-dependency-path: |
-             eks/go.sum
+             source/go.sum
 
       # Step 3: Read and increment version
       - name: Increment version
         id: version
         run: |
           # Read the current version from the VERSION file
-          VERSION_FILE=eks/VERSION
+          VERSION_FILE=source/VERSION
           if [ ! -f "$VERSION_FILE" ]; then
             echo "0.0.0" > $VERSION_FILE
           fi
@@ -43,7 +43,7 @@ jobs:
       # Step 4: Install dependencies
       - name: Install Go dependencies and build
         run: |
-          cd eks
+          cd source
           go mod tidy
           go build -o keit .
           CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o keit .
@@ -74,7 +74,7 @@ jobs:
         run: |
           git config --local user.name "GitHub Actions"
           git config --local user.email "actions@github.com"
-          git add eks/VERSION
+          git add source/VERSION
           git commit -m "Bump version to ${{ env.version }}"
           git push
         env:

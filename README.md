@@ -163,7 +163,7 @@ If you are running on AWS, KEIT runs the Boavizta API in your cluster to dynamic
 Install the helm chart:
 
 ```bash
-helm install --namespace keit -f eks/helm/values.yaml keit-boavizta-exporter eks/helm --create-namespace
+helm install --namespace keit -f helm/values.yaml keit-boavizta-exporter helm --create-namespace
 ```
 
 And you can test that the Boavizta exporter is running:
@@ -202,7 +202,7 @@ For example:
 
 #### Create the Grafana dashboard
 
-The KEIT Grafana dashboard definition is in the repository, KEIT_grafana_dashboard.json.
+The KEIT Grafana dashboard definition is in the repository, grafana/KEIT_grafana_dashboard.json.
 
 Update the PUE to your value and then import it to Grafana.
 

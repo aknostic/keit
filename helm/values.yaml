@@ -1,0 +1,25 @@
+replicaCount: 1
+
+image:
+  repository: ghcr.io/aknostic/keit
+  tag: latest
+  pullPolicy: Always
+
+service:
+  type: ClusterIP
+  port: 8080
+
+namespace: keit
+
+boavizta:
+  enabled: true
+  image:
+    repository: boavizta/boavizta-app
+    tag: latest
+    pullPolicy: Always
+  replicaCount: 1
+
+servicemonitor:
+  enabled: true
+  interval: 15m
+  scrapeTimeout: 2m

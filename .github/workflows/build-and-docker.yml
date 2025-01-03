@@ -1,0 +1,82 @@
+# Build a docker image with KEIT and push it to container registry (Github Container Registry)
+name: Build and Dockerize KEIT Go Application
+
+on:
+  workflow_dispatch:  # Allows manual triggering of the workflow
+
+jobs:
+  build-and-dockerize:
+    runs-on: ubuntu-24.04
+
+    steps:
+      # Step 1: Checkout the code
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      # Step 2: Set up Go environment
+      - name: Set up Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: 1.23
+          cache-dependency-path: |
+             source/go.sum
+
+      # Step 3: Read and increment version
+      - name: Increment version
+        id: version
+        run: |
+          # Read the current version from the VERSION file
+          VERSION_FILE=source/VERSION
+          if [ ! -f "$VERSION_FILE" ]; then
+            echo "0.0.0" > $VERSION_FILE
+          fi
+          CURRENT_VERSION=$(cat $VERSION_FILE)
+
+          # Increment the patch version
+          IFS='.' read -r MAJOR MINOR PATCH <<< "$CURRENT_VERSION"
+          PATCH=$((PATCH + 1))
+          NEW_VERSION="$MAJOR.$MINOR.$PATCH"
+
+          # Write the new version to the file
+          echo "$NEW_VERSION" > $VERSION_FILE
+          echo "version=$NEW_VERSION" >> $GITHUB_ENV
+
+      # Step 4: Install dependencies
+      - name: Install Go dependencies and build
+        run: |
+          cd source
+          go mod tidy
+          go build -o keit .
+          CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o keit .
+          docker build -t keit:${{ env.version }} .
+
+      # Step 5: login to ghcr.io 
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v2
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GTH_TOKEN }}
+
+      # Step 6: Push Docker image to GitHub Container Registry
+      - name: Push Docker image to GitHub Container Registry
+        run: |
+          docker tag keit:${{ env.version }} ghcr.io/aknostic/keit:${{ env.version }}
+          docker push ghcr.io/aknostic/keit:${{ env.version }}
+
+      # Step 7: Add and push 'latest' tag
+      - name: Push Docker image with latest tag
+        run: |
+          docker tag keit:${{ env.version }} ghcr.io/aknostic/keit:latest
+          docker push ghcr.io/aknostic/keit:latest
+
+      # Step 8: Commit updated version file
+      - name: Commit and push updated version
+        run: |
+          git config --local user.name "GitHub Actions"
+          git config --local user.email "actions@github.com"
+          git add source/VERSION
+          git commit -m "Bump version to ${{ env.version }}"
+          git push
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

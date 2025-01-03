@@ -1,0 +1,20 @@
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: keit-servicemonitor
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/name: keit-servicemonitor
+    release: prometheus 
+spec:
+  selector:
+    matchLabels:
+      app: keit-service
+  namespaceSelector:
+    matchNames:
+    - {{ .Release.Namespace }}
+  endpoints:
+    - port: metrics
+      path: /metrics
+      interval: {{ .Values.servicemonitor.interval }}
+      scrapeTimeout: {{ .Values.servicemonitor.scrapeTimeout }}

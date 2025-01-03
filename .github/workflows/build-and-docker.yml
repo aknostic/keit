@@ -1,3 +1,4 @@
+# Build a docker image with KEIT and push it to container registry (Github Container Registry)
 name: Build and Dockerize KEIT Go Application
 
 on:

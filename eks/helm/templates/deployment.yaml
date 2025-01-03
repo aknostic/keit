@@ -15,7 +15,7 @@ spec:
     spec:
       containers:
       - name: keit-app-container
-        image: ghcr.io/aknostic/keit:latest 
+        image: ghcr.io/aknostic/keit:0.0.3
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         ports:
         - containerPort: 8080

@@ -211,3 +211,5 @@ You can access Grafana by port forwarding:
 ```bash
 kubectl port-forward svc/kube-prometheus-stack-grafana 8082:80 -n monitoring &
 ```
+
+And view your KEIT dashboard locally at http://localhost:8082 (with the default credentials admin/prom-operator, if you just installed it).

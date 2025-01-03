@@ -1,4 +1,4 @@
-name: Build and Dockerize KIET Go Application
+name: Build and Dockerize KEIT Go Application
 
 on:
   workflow_dispatch:  # Allows manual triggering of the workflow

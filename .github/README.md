@@ -1,6 +1,6 @@
 Behavior github action: Build and Dockerize KEIT Go Application.
 - Can only be run by locomundo and geurjas (admins)
-- It runs only in branch (not in the main branch)
+- It runs only in a branch (not in the main branch)
 
 Process of building a new docker image:
 

@@ -16,6 +16,15 @@ jobs:
             exit 1
           fi
 
+      - name: Verify Branch
+        run: |
+          echo "Triggered on branch ${{ github.ref_name }}"
+          if [[ "${{ github.ref_name }}" == "main" ]]; then
+            echo "Execution is not allowed on the main branch."
+            exit 1
+          fi
+          echo "Branch ${{ github.ref_name }} is authorized."
+
   build-and-dockerize:
     runs-on: ubuntu-24.04
 

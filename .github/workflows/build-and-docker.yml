@@ -50,6 +50,7 @@ jobs:
 
           # Write the new version to the file
           echo "$NEW_VERSION" > $VERSION_FILE
+          echo $NEW_VERSION
           echo "version=$NEW_VERSION" >> $GITHUB_ENV
 
       # Step 4: Install dependencies

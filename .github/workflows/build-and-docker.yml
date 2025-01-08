@@ -5,6 +5,17 @@ on:
   workflow_dispatch:  # Allows manual triggering of the workflow
 
 jobs:
+  check-admin:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Verify Triggering User
+        run: |
+          echo "Triggered by ${{ github.actor }}"
+          if [[ "${{ github.actor }}" != "admin-username" ]]; then
+            echo "Unauthorized user: ${{ github.actor }}"
+            exit 1
+          fi
+
   build-and-dockerize:
     runs-on: ubuntu-24.04
 

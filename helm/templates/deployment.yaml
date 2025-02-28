@@ -15,8 +15,14 @@ spec:
     spec:
       containers:
       - name: keit-app-container
-        image: ghcr.io/aknostic/keit:0.0.3
+        image: "{{ .Values.image.repository }}:{{ .Values.image.tag }}"
         imagePullPolicy: {{ .Values.image.pullPolicy }}
         ports:
         - containerPort: 8080
-
+        resources:
+          requests:
+            cpu: 50m
+            memory: 50Mi
+          limits:
+            cpu: 50m
+            memory: 50Mi

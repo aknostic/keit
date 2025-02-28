@@ -20,5 +20,5 @@ boavizta:
 
 servicemonitor:
   enabled: true
-  interval: 1m
-  scrapeTimeout: 1m
+  interval: 15m
+  scrapeTimeout: 2m

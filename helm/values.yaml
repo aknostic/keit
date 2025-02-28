@@ -12,14 +12,13 @@ service:
 namespace: keit
 
 boavizta:
-  enabled: true
   image:
-    repository: boavizta/boavizta-app
+    repository: ghcr.io/boavizta/boaviztapi
     tag: latest
     pullPolicy: Always
   replicaCount: 1
 
 servicemonitor:
   enabled: true
-  interval: 15m
-  scrapeTimeout: 2m
+  interval: 1m
+  scrapeTimeout: 1m

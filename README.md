@@ -149,7 +149,7 @@ Install the grid-intensity-exporter helm chart:
 kubectl apply -f keit/grid-intensity-exporter/namespace.yml
 kubectl apply -f keit/grid-intensity-exporter/servicemonitor.yml
 git clone git@github.com:thegreenwebfoundation/grid-intensity-go.git
-helm install -n grid-intensity -f keit/grid-intensity-exporter/values.yaml grid-intensity-exporter grid-intensity-go/helm/grid-intensity-exporter
+helm install -n grid-intensity -f keit/grid-intensity-exporter/values.yml grid-intensity-exporter grid-intensity-go/helm/grid-intensity-exporter
 ```
 
 ### Get embodied emissions

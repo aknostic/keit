@@ -12,9 +12,8 @@ service:
 namespace: keit
 
 boavizta:
-  enabled: true
   image:
-    repository: boavizta/boavizta-app
+    repository: ghcr.io/boavizta/boaviztapi
     tag: latest
     pullPolicy: Always
   replicaCount: 1

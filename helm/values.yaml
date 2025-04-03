@@ -1,24 +1,51 @@
+# replicaCount specifies the number of replicas for the Keit deployment
 replicaCount: 1
 
+# image contains the container image configuration for Keit
 image:
+  # repository specifies the container image repository for Keit
   repository: ghcr.io/aknostic/keit
+
+  # tag specifies the container image tag for Keit
   tag: latest
+
+  # pullPolicy specifies the container image pull policy for Keit (Always, IfNotPresent, Never)
   pullPolicy: Always
 
+# service contains Kubernetes Service configuration for exposing Keit
 service:
+  # type specifies the Kubernetes service type for Keit (ClusterIP, NodePort, LoadBalancer)
   type: ClusterIP
+
+  # port specifies the port number on which Keit service will be exposed internally
   port: 8080
 
+# namespace specifies the Kubernetes namespace where Keit resources will be deployed
 namespace: keit
 
+# boavizta contains configuration for the Boavizta deployment
 boavizta:
+  # image contains container image details for Boavizta
   image:
+    # repository specifies the container image repository for Boavizta
     repository: ghcr.io/boavizta/boaviztapi
+
+    # tag specifies the container image tag for Boavizta
     tag: latest
+
+    # pullPolicy specifies the container image pull policy for Boavizta (Always, IfNotPresent, Never)
     pullPolicy: Always
+
+  # replicaCount specifies the number of replicas for the Boavizta deployment
   replicaCount: 1
 
+# servicemonitor contains configuration for Prometheus ServiceMonitor
 servicemonitor:
+  # enabled specifies whether to enable ServiceMonitor creation
   enabled: true
+
+  # interval specifies the interval at which Prometheus scrapes metrics
   interval: 15m
+
+  # scrapeTimeout specifies the scrape timeout duration for Prometheus metrics collection
   scrapeTimeout: 2m

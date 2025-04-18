@@ -20,9 +20,6 @@ service:
   # port specifies the port number on which Keit service will be exposed internally
   port: 8080
 
-# namespace specifies the Kubernetes namespace where Keit resources will be deployed
-namespace: keit
-
 # boavizta contains configuration for the Boavizta deployment
 boavizta:
   # image contains container image details for Boavizta

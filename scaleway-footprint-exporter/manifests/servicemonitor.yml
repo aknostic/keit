@@ -1,0 +1,23 @@
+# Apply this file ONLY if your cluster runs the Prometheus Operator (i.e. has
+# the monitoring.coreos.com/v1 CRD installed). For Alloy / Vector / annotation-
+# based discovery, see the prometheus.io/scrape annotations in deployment.yml.
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: scaleway-footprint-exporter
+  namespace: keit
+  labels:
+    app.kubernetes.io/name: scaleway-footprint-exporter
+spec:
+  endpoints:
+    - path: /metrics
+      port: metrics
+      scheme: http
+      interval: 5m
+      scrapeTimeout: 30s
+  namespaceSelector:
+    matchNames:
+      [ keit ]
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: scaleway-footprint-exporter

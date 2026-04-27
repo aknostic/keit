@@ -1,0 +1,55 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: scaleway-footprint-exporter
+  namespace: keit
+  labels:
+    app.kubernetes.io/name: scaleway-footprint-exporter
+    app.kubernetes.io/component: keit-data-source
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: scaleway-footprint-exporter
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: scaleway-footprint-exporter
+      annotations:
+        # Annotation-based scrape discovery — used by Grafana Alloy, Vector,
+        # and classic Prometheus configured with kubernetes_sd_configs.
+        # Harmless if your stack uses ServiceMonitor instead (see servicemonitor.yml).
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "8080"
+        prometheus.io/path: "/metrics"
+    spec:
+      containers:
+        - name: exporter
+          # Replace with the registry path your cluster can pull from.
+          image: REPLACE_WITH_REGISTRY/scaleway-footprint-exporter:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: metrics
+              containerPort: 8080
+          envFrom:
+            - secretRef:
+                name: scaleway-footprint-credentials
+          resources:
+            requests:
+              cpu: 10m
+              memory: 32Mi
+            limits:
+              cpu: 100m
+              memory: 64Mi
+          livenessProbe:
+            httpGet:
+              path: /metrics
+              port: 8080
+            initialDelaySeconds: 15
+            periodSeconds: 30
+          readinessProbe:
+            httpGet:
+              path: /metrics
+              port: 8080
+            initialDelaySeconds: 5
+            periodSeconds: 10

@@ -1,0 +1,2 @@
+# Local Go build artifact produced by `go build .`
+/scaleway-footprint-exporter

@@ -1,0 +1,19 @@
+apiVersion: v2
+name: scaleway-footprint-exporter
+description: Prometheus exporter for the Scaleway Environmental Footprint API. Adds per-project, per-region, per-SKU carbon and water metrics to KEIT.
+type: application
+version: 0.1.0
+appVersion: "0.1.0"
+keywords:
+  - sustainability
+  - carbon
+  - water
+  - prometheus
+  - scaleway
+  - keit
+home: https://github.com/aknostic/keit
+sources:
+  - https://github.com/aknostic/keit
+maintainers:
+  - name: Aknostic
+    url: https://aknostic.com

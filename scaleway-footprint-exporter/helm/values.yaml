@@ -1,0 +1,70 @@
+# replicaCount specifies the number of replicas for the exporter
+replicaCount: 1
+
+# image contains the container image configuration
+image:
+  # repository specifies the container image repository
+  repository: ghcr.io/aknostic/scaleway-footprint-exporter
+  # tag overrides the image tag; defaults to .Chart.AppVersion if left empty
+  tag: ""
+  # pullPolicy specifies the image pull policy (Always, IfNotPresent, Never)
+  pullPolicy: IfNotPresent
+
+# resources sets pod resource requests and limits. Defaults are sized for a
+# small org; override for very large Scaleway accounts.
+resources:
+  requests:
+    cpu: 10m
+    memory: 32Mi
+  limits:
+    cpu: 100m
+    memory: 64Mi
+
+# scrapeAnnotations adds prometheus.io/* annotations to the pod template, so
+# annotation-based scrape discovery (Grafana Alloy, Vector, classic Prometheus
+# with kubernetes_sd_configs) picks the pod up automatically. Harmless if
+# nothing in your cluster is listening for them.
+scrapeAnnotations:
+  enabled: true
+
+# service contains Kubernetes Service configuration
+service:
+  # type specifies the Kubernetes service type (ClusterIP, NodePort, LoadBalancer)
+  type: ClusterIP
+  # port specifies the port the Service exposes
+  port: 8080
+
+# servicemonitor contains Prometheus Operator ServiceMonitor configuration.
+# Enable this if your cluster runs the Prometheus Operator. Otherwise leave
+# disabled and rely on scrapeAnnotations or your own scrape config.
+servicemonitor:
+  enabled: false
+  interval: 5m
+  scrapeTimeout: 30s
+
+# secret manages the Scaleway credentials Secret consumed by the exporter.
+#
+# Three deployment patterns:
+#   1. Inline values (NOT for production — credentials end up in the Helm release):
+#        secret:
+#          create: true
+#          scwOrgId: "..."
+#          scwSecretKey: "..."
+#   2. Existing Secret (typical for SOPS / sealed-secrets / external-secrets):
+#        secret:
+#          create: false
+#          existingSecretName: scaleway-footprint-credentials
+#   3. Inline-with-CI-injected values (Helm `--set` from a CI variable).
+#
+# The Secret (whether chart-created or pre-existing) MUST contain keys
+# SCW_ORG_ID and SCW_SECRET_KEY.
+secret:
+  create: true
+  existingSecretName: ""
+  scwOrgId: ""
+  scwSecretKey: ""
+
+# Pass-through pod scheduling controls
+nodeSelector: {}
+tolerations: []
+affinity: {}

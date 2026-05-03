@@ -1,0 +1,22 @@
+{{- if .Values.servicemonitor.enabled }}
+apiVersion: monitoring.coreos.com/v1
+kind: ServiceMonitor
+metadata:
+  name: scaleway-footprint-exporter
+  namespace: {{ .Release.Namespace }}
+  labels:
+    app.kubernetes.io/name: scaleway-footprint-exporter
+    release: prometheus
+spec:
+  selector:
+    matchLabels:
+      app: scaleway-footprint-exporter
+  namespaceSelector:
+    matchNames:
+      - {{ .Release.Namespace }}
+  endpoints:
+    - port: metrics
+      path: /metrics
+      interval: {{ .Values.servicemonitor.interval }}
+      scrapeTimeout: {{ .Values.servicemonitor.scrapeTimeout }}
+{{- end }}

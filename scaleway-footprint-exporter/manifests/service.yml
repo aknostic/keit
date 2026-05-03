@@ -1,0 +1,18 @@
+# Required by servicemonitor.yml; also useful for `kubectl port-forward` debugging.
+# Annotation-based discovery (Alloy, Vector, plain Prometheus) scrapes the Pod
+# directly and does not require this Service.
+apiVersion: v1
+kind: Service
+metadata:
+  name: scaleway-footprint-exporter
+  namespace: keit
+  labels:
+    app.kubernetes.io/name: scaleway-footprint-exporter
+spec:
+  selector:
+    app.kubernetes.io/name: scaleway-footprint-exporter
+  ports:
+    - name: metrics
+      port: 8080
+      targetPort: 8080
+  type: ClusterIP

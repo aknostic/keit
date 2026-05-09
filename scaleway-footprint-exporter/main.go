@@ -19,6 +19,10 @@ import (
 const (
 	scalewayAPIBase = "https://api.scaleway.com"
 	scrapeInterval  = 1 * time.Hour
+	// Number of trailing UTC days to query as separate 1-day windows. Scaleway's
+	// footprint pipeline lags by several days (verified 2026-05-03: ~3-4d) and
+	// occasionally backfills, so we re-query a rolling window every scrape.
+	lookbackDays = 14
 )
 
 // Response shape from /environmental-footprint/v1alpha1/data/query
@@ -57,13 +61,10 @@ type Project struct {
 type FootprintResponse struct {
 	StartDate   string    `json:"start_date"`
 	EndDate     string    `json:"end_date"`
-	TotalImpact Impact    `json:"total_impact"`
+	TotalImpact *Impact   `json:"total_impact"`
 	Projects    []Project `json:"projects"`
 }
 
-// Project list response (subset). Endpoint path is /account/v3/projects per
-// Scaleway IAM conventions — verify on first run; if the endpoint is different
-// the exporter still works, it just labels metrics with UUIDs instead of names.
 type ProjectListResponse struct {
 	Projects []struct {
 		ID   string `json:"id"`
@@ -75,21 +76,33 @@ var (
 	co2Gauge = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
 			Name: "keit_scaleway_co2_kg",
-			Help: "Daily kgCO2e from Scaleway Environmental Footprint API, aggregated at SKU level (resource type, not per-instance).",
+			Help: "kgCO2e from the Scaleway Environmental Footprint API for a single UTC day, aggregated at SKU level (resource type, not per-instance). The report_date label is the UTC start of the 1-day window the value covers.",
 		},
-		[]string{"project_id", "project_name", "region", "zone", "sku", "service_category", "product_category"},
+		[]string{"report_date", "project_id", "project_name", "region", "zone", "sku", "service_category", "product_category"},
 	)
 	waterGauge = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
 			Name: "keit_scaleway_water_m3",
-			Help: "Daily water usage in m^3 from Scaleway Environmental Footprint API, aggregated at SKU level.",
+			Help: "Water usage in m^3 from the Scaleway Environmental Footprint API for a single UTC day, aggregated at SKU level. Same labels as keit_scaleway_co2_kg.",
 		},
-		[]string{"project_id", "project_name", "region", "zone", "sku", "service_category", "product_category"},
+		[]string{"report_date", "project_id", "project_name", "region", "zone", "sku", "service_category", "product_category"},
+	)
+	dataLagDaysGauge = prometheus.NewGauge(
+		prometheus.GaugeOpts{
+			Name: "keit_scaleway_data_lag_days",
+			Help: "Whole UTC days between the freshest possible report (yesterday) and the most recent day with non-empty Scaleway data within the lookback window. 0 means yesterday is available; lookbackDays means no data found in the window.",
+		},
+	)
+	scrapeSuccessGauge = prometheus.NewGauge(
+		prometheus.GaugeOpts{
+			Name: "keit_scaleway_scrape_success",
+			Help: "1 if the most recent scrape successfully fetched at least one day of data, else 0. When 0, the per-day gauges retain their last-known-good values.",
+		},
 	)
 )
 
 func init() {
-	prometheus.MustRegister(co2Gauge, waterGauge)
+	prometheus.MustRegister(co2Gauge, waterGauge, dataLagDaysGauge, scrapeSuccessGauge)
 }
 
 type client struct {
@@ -97,7 +110,7 @@ type client struct {
 	token      string
 	http       *http.Client
 	projectsMu sync.RWMutex
-	projects   map[string]string // project_id -> name
+	projects   map[string]string
 }
 
 func newClient(orgID, token string) *client {
@@ -173,49 +186,121 @@ func (c *client) fetchFootprint(ctx context.Context, start, end time.Time) (*Foo
 	return &resp, nil
 }
 
-func (c *client) scrape(ctx context.Context) error {
-	now := time.Now().UTC()
-	end := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, time.UTC)
-	start := end.Add(-24 * time.Hour)
+type skuRecord struct {
+	projectID, projectName             string
+	region, zone, sku                  string
+	serviceCategory, productCategory   string
+	co2Kg, waterM3                     float64
+}
 
+type dayResult struct {
+	reportDate string
+	start      time.Time
+	skus       []skuRecord
+	fetched    bool
+}
+
+func (c *client) scrape(ctx context.Context) error {
 	if err := c.refreshProjectNames(ctx); err != nil {
 		log.Printf("project-name refresh failed (will use UUIDs as labels): %v", err)
 	}
 
-	resp, err := c.fetchFootprint(ctx, start, end)
-	if err != nil {
-		return err
+	now := time.Now().UTC()
+	todayMidnight := time.Date(now.Year(), now.Month(), now.Day(), 0, 0, 0, 0, time.UTC)
+
+	results := make([]dayResult, 0, lookbackDays)
+	successes := 0
+	var mostRecentWithData time.Time
+
+	for d := 0; d < lookbackDays; d++ {
+		end := todayMidnight.AddDate(0, 0, -d)
+		start := end.AddDate(0, 0, -1)
+		reportDate := start.Format("2006-01-02")
+
+		resp, err := c.fetchFootprint(ctx, start, end)
+		if err != nil {
+			log.Printf("fetch %s failed: %v", reportDate, err)
+			results = append(results, dayResult{reportDate: reportDate, start: start, fetched: false})
+			continue
+		}
+		successes++
+
+		var skus []skuRecord
+		for _, p := range resp.Projects {
+			name := c.projectName(p.ProjectID)
+			for _, r := range p.Regions {
+				for _, z := range r.Zones {
+					for _, s := range z.SKUs {
+						skus = append(skus, skuRecord{
+							projectID:       p.ProjectID,
+							projectName:     name,
+							region:          r.Region,
+							zone:            z.Zone,
+							sku:             s.SKU,
+							serviceCategory: s.ServiceCategory,
+							productCategory: s.ProductCategory,
+							co2Kg:           s.TotalSKUImpact.KgCO2Equivalent,
+							waterM3:         s.TotalSKUImpact.M3WaterUsage,
+						})
+					}
+				}
+			}
+		}
+		if len(skus) > 0 && start.After(mostRecentWithData) {
+			mostRecentWithData = start
+		}
+		results = append(results, dayResult{reportDate: reportDate, start: start, skus: skus, fetched: true})
+	}
+
+	if successes == 0 {
+		scrapeSuccessGauge.Set(0)
+		log.Printf("scrape: all %d fetches failed; keeping last-known-good gauges", lookbackDays)
+		return fmt.Errorf("all fetches failed")
 	}
 
 	co2Gauge.Reset()
 	waterGauge.Reset()
-
-	skuCount := 0
-	for _, p := range resp.Projects {
-		name := c.projectName(p.ProjectID)
-		for _, r := range p.Regions {
-			for _, z := range r.Zones {
-				for _, s := range z.SKUs {
-					labels := prometheus.Labels{
-						"project_id":       p.ProjectID,
-						"project_name":     name,
-						"region":           r.Region,
-						"zone":             z.Zone,
-						"sku":              s.SKU,
-						"service_category": s.ServiceCategory,
-						"product_category": s.ProductCategory,
-					}
-					co2Gauge.With(labels).Set(s.TotalSKUImpact.KgCO2Equivalent)
-					waterGauge.With(labels).Set(s.TotalSKUImpact.M3WaterUsage)
-					skuCount++
-				}
+	skuRowsTotal := 0
+	daysWithData := 0
+	for _, dr := range results {
+		if !dr.fetched {
+			continue
+		}
+		if len(dr.skus) > 0 {
+			daysWithData++
+		}
+		for _, s := range dr.skus {
+			labels := prometheus.Labels{
+				"report_date":      dr.reportDate,
+				"project_id":       s.projectID,
+				"project_name":     s.projectName,
+				"region":           s.region,
+				"zone":             s.zone,
+				"sku":              s.sku,
+				"service_category": s.serviceCategory,
+				"product_category": s.productCategory,
 			}
+			co2Gauge.With(labels).Set(s.co2Kg)
+			waterGauge.With(labels).Set(s.waterM3)
+			skuRowsTotal++
 		}
 	}
 
-	log.Printf("scrape ok: window %s..%s, %d projects, %d SKU rows, total %.3f kgCO2e",
-		start.Format("2006-01-02"), end.Format("2006-01-02"),
-		len(resp.Projects), skuCount, resp.TotalImpact.KgCO2Equivalent)
+	freshestPossible := todayMidnight.AddDate(0, 0, -1)
+	if !mostRecentWithData.IsZero() {
+		lag := freshestPossible.Sub(mostRecentWithData).Hours() / 24
+		dataLagDaysGauge.Set(lag)
+	} else {
+		dataLagDaysGauge.Set(float64(lookbackDays))
+	}
+	scrapeSuccessGauge.Set(1)
+
+	freshestStr := "(none)"
+	if !mostRecentWithData.IsZero() {
+		freshestStr = mostRecentWithData.Format("2006-01-02")
+	}
+	log.Printf("scrape ok: %d/%d days fetched, %d days with data, %d SKU rows, freshest=%s",
+		successes, lookbackDays, daysWithData, skuRowsTotal, freshestStr)
 	return nil
 }
 

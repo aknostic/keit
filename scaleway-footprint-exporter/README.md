@@ -8,19 +8,23 @@ KEIT historically uses Kepler for energy and Boavizta for embodied carbon. Neith
 
 ## What it emits
 
-Two metric families, both gauges, both labeled the same:
+Per-day SKU gauges plus two scrape-health gauges:
 
 ```
-keit_scaleway_co2_kg{project_id, project_name, region, zone, sku, service_category, product_category}
-keit_scaleway_water_m3{project_id, project_name, region, zone, sku, service_category, product_category}
+keit_scaleway_co2_kg{report_date, project_id, project_name, region, zone, sku, service_category, product_category}
+keit_scaleway_water_m3{report_date, project_id, project_name, region, zone, sku, service_category, product_category}
+keit_scaleway_data_lag_days
+keit_scaleway_scrape_success
 ```
 
-Each metric value is the **previous full UTC day's total** for that combination. Re-emitted every hour (the underlying API only refreshes daily).
+Each scrape (hourly) re-queries the trailing 14 UTC days as 14 separate 1-day calls. Every day with non-empty data is emitted with `report_date=YYYY-MM-DD` (the start of the 1-day window). This produces a real daily timeseries for Grafana — `sum by (report_date)(keit_scaleway_co2_kg)` plots one bar per day.
+
+`keit_scaleway_data_lag_days` is the whole UTC days between yesterday and the most recent day with data; 0 means yesterday is fresh, `lookbackDays` (14) means nothing in the window has data. `keit_scaleway_scrape_success` is 1 if at least one day's fetch succeeded in the most recent scrape, else 0 — when 0, the per-day gauges retain their last-known-good values.
 
 ## Granularity caveats — read these
 
 - **SKU is a resource type, not an instance.** A single value covers *all* PRO2-XXS instances in fr-par-1 in that project. Per-instance / per-pod attribution is not possible from this data alone — you have to join with Kubernetes metadata and pick an attribution rule (CPU-weighted, memory-weighted, even split). Do that in a Prometheus recording rule, not here.
-- **Daily aggregate, not real-time.** "Yesterday" is the freshest you'll get.
+- **Data lag is real.** Scaleway's footprint pipeline can lag several days; `keit_scaleway_data_lag_days` exposes how far behind it is. Alert on it crossing some threshold (e.g. > 5).
 - **Some regions report `m3_water_usage = 0`** (e.g. WAW). Scaleway hasn't published water data for every datacenter.
 - **Kapsule control plane** (`/k8s/control-plane/<region>`) is a flat ~0.14 kg per project per month in fr-par; doesn't scale with workload.
 

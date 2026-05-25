@@ -212,3 +212,15 @@ You can access Grafana by port forwarding:
 kubectl port-forward svc/kube-prometheus-stack-grafana 8082:80 -n monitoring &
 ```
 And view your KEIT dashboard locally at http://localhost:8082 (with the default credentials admin/prom-operator, if you just installed it).
+
+#### Additional reusable dashboards
+
+The `grafana/dashboards/` directory contains four more dashboards developed for KEIT on Scaleway, genericised to work on any cluster:
+
+- **`keit-scaleway-footprint`** — raw vendor data from the Scaleway Environmental Footprint API
+- **`keit-scaleway-vs-sci-comparison`** — side-by-side KEIT-computed SCI vs Scaleway-bundled
+- **`keit-scaleway-hotspots`** — finding-oriented (top SKUs, regional-grid heatmap, regression detection)
+- **`keit-rightsizing`** — Kepler + kube-state-metrics for overprovisioned / underprovisioned pods
+
+See [`grafana/dashboards/README.md`](grafana/dashboards/README.md) for what each does, required metrics, and how to import them.
+

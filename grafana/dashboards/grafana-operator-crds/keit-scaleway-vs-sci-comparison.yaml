@@ -1,0 +1,697 @@
+apiVersion: grafana.integreatly.org/v1beta1
+kind: GrafanaDashboard
+metadata:
+  name: keit-scaleway-vs-sci-comparison
+  namespace: <your-grafana-operator-namespace>
+spec:
+  allowCrossNamespaceImport: true
+  instanceSelector:
+    matchLabels:
+      # Set this to whatever your Grafana Operator GrafanaCR labels its instance with
+      # See https://grafana.github.io/grafana-operator/docs/dashboards/
+      <key>: <value>
+  json: |
+    {
+      "title": "KEIT — Scaleway vs SCI Comparison",
+      "tags": [
+        "keit",
+        "sustainability",
+        "scaleway",
+        "sci",
+        "comparison",
+        "talk",
+        "reusable"
+      ],
+      "editable": true,
+      "schemaVersion": 39,
+      "refresh": "5m",
+      "time": {
+        "from": "now-7d",
+        "to": "now"
+      },
+      "templating": {
+        "list": [
+          {
+            "datasource": {
+              "type": "prometheus",
+              "uid": "${DS_PROMETHEUS}"
+            },
+            "definition": "label_values(keit_scaleway_co2_kg, kubernetes_cluster)",
+            "includeAll": true,
+            "allValue": ".+",
+            "multi": true,
+            "label": "Cluster",
+            "name": "cluster",
+            "query": "label_values(keit_scaleway_co2_kg, kubernetes_cluster)",
+            "refresh": 2,
+            "type": "query",
+            "current": {
+              "selected": true,
+              "text": "All",
+              "value": "$__all"
+            }
+          },
+          {
+            "name": "project",
+            "type": "query",
+            "datasource": {
+              "type": "prometheus",
+              "uid": "${DS_PROMETHEUS}"
+            },
+            "label": "Scaleway Project (scoped to match KEIT-side, which only sees the cluster's own pods)",
+            "definition": "label_values(keit_scaleway_co2_kg{kubernetes_cluster=~\"$cluster\"}, project_name)",
+            "query": "label_values(keit_scaleway_co2_kg{kubernetes_cluster=~\"$cluster\"}, project_name)",
+            "includeAll": true,
+            "allValue": ".+",
+            "multi": false,
+            "refresh": 2,
+            "current": {
+              "selected": true,
+              "text": "Groupware",
+              "value": "Groupware"
+            }
+          },
+          {
+            "name": "watt_per_second_to_kWh",
+            "type": "constant",
+            "query": "0.000000277777777777778",
+            "label": "Wh/s → kWh",
+            "hide": 2
+          },
+          {
+            "name": "seconds_five_years",
+            "type": "constant",
+            "query": "157766400",
+            "label": "5 years in seconds",
+            "hide": 2
+          },
+          {
+            "name": "PUE_scaleway",
+            "type": "constant",
+            "query": "1.38",
+            "label": "Scaleway Paris-DC avg PUE (2024)",
+            "hide": 2
+          },
+          {
+            "name": "embodied_kg_5yr",
+            "type": "constant",
+            "query": "195",
+            "label": "Embodied kgCO2eq per cluster, 5yr (Boavizta)",
+            "hide": 2
+          },
+          {
+            "name": "Energy",
+            "type": "query",
+            "datasource": {
+              "type": "prometheus",
+              "uid": "${DS_PROMETHEUS}"
+            },
+            "label": "Energy (kWh)",
+            "query": {
+              "qryType": 3,
+              "query": "query_result(scalar(sum(increase(kepler_container_joules_total{kubernetes_cluster=~\"$cluster\"}[$__range])) * $watt_per_second_to_kWh))",
+              "refId": "PrometheusVariableQueryEditor-VariableQuery"
+            },
+            "refresh": 2,
+            "hide": 2
+          },
+          {
+            "name": "EnergyCarbonIntensity",
+            "type": "query",
+            "datasource": {
+              "type": "prometheus",
+              "uid": "${DS_PROMETHEUS}"
+            },
+            "label": "Avg grid intensity (gCO2/kWh)",
+            "query": {
+              "qryType": 3,
+              "query": "query_result(scalar(avg(avg_over_time(grid_intensity_carbon_average{kubernetes_cluster=~\"$cluster\",job=\"prometheus.scrape.annotated_pods\"}[$__range]))))",
+              "refId": "PrometheusVariableQueryEditor-VariableQuery"
+            },
+            "refresh": 2,
+            "hide": 2
+          }
+        ]
+      },
+      "panels": [
+        {
+          "type": "text",
+          "id": 100,
+          "gridPos": {
+            "h": 4,
+            "w": 24,
+            "x": 0,
+            "y": 0
+          },
+          "options": {
+            "mode": "markdown",
+            "content": "> ℹ️ **Reusable dashboard from KEIT** — see [github.com/aknostic/keit/grafana/dashboards](https://github.com/aknostic/keit/tree/main/grafana/dashboards) for the source and other reusable dashboards.\n\n## Two ways to compute the same number\n\nAll values shown in **kgCO2eq** (kilograms of CO₂ equivalent — includes other greenhouse gases normalized to CO₂'s 100-year warming effect).\n\n**SCI side (computed by KEIT):** `(Energy × Grid intensity × PUE) + Embodied`. Energy from **Kepler** (eBPF), grid intensity live from **ElectricityMaps**, PUE = **1.38** (Scaleway Paris-DC avg, 2024), embodied = **195 kgCO2eq** for the 3-PRO2-S cluster over 5 years (Boavizta).\n\n**Scaleway side (vendor-bundled):** `sum(keit_scaleway_co2_kg{project_name=~\"$project\"})` — Scaleway's own ADEME-based number, includes operational + embodied in one figure, per-SKU.\n\nBoth sides are scoped to the **Groupware** Scaleway project, so the comparison is apples-to-apples. Use the **Project** dropdown to look at another project (KEIT-side numbers won't match for those — Kepler only sees containers running on this cluster).\n\nDifferent methodology. Different attribution. **Both useful** for different actions. The gap is the talk."
+          }
+        },
+        {
+          "type": "row",
+          "id": 101,
+          "title": "SCI inputs (KEIT side)",
+          "gridPos": {
+            "h": 1,
+            "w": 24,
+            "x": 0,
+            "y": 4
+          },
+          "collapsed": false
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "description": "Total energy used by all containers in the cluster over the dashboard time range. From Kepler (eBPF + trained power model — no RAPL on Kapsule).",
+          "fieldConfig": {
+            "defaults": {
+              "unit": "kwatth",
+              "decimals": 3
+            }
+          },
+          "gridPos": {
+            "h": 5,
+            "w": 6,
+            "x": 0,
+            "y": 5
+          },
+          "id": 1,
+          "options": {
+            "colorMode": "value",
+            "graphMode": "area",
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ]
+            }
+          },
+          "targets": [
+            {
+              "expr": "sum(increase(kepler_container_joules_total{kubernetes_cluster=~\"$cluster\"}[$__range])) * $watt_per_second_to_kWh",
+              "refId": "A"
+            }
+          ],
+          "title": "Energy (Kepler)",
+          "type": "stat"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "description": "Average French grid carbon intensity over the time range. From ElectricityMaps via grid-intensity-exporter. France is nuclear-heavy → low intensity vs e.g. Germany (200–400 g/kWh).",
+          "fieldConfig": {
+            "defaults": {
+              "unit": "short",
+              "decimals": 1,
+              "custom": {
+                "displayName": "gCO2eq / kWh"
+              }
+            }
+          },
+          "gridPos": {
+            "h": 5,
+            "w": 6,
+            "x": 6,
+            "y": 5
+          },
+          "id": 2,
+          "options": {
+            "colorMode": "value",
+            "graphMode": "area",
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ]
+            }
+          },
+          "targets": [
+            {
+              "expr": "avg(avg_over_time(grid_intensity_carbon_average{kubernetes_cluster=~\"$cluster\",job=\"prometheus.scrape.annotated_pods\"}[$__range]))",
+              "legendFormat": "gCO2eq/kWh",
+              "refId": "A"
+            }
+          ],
+          "title": "Grid intensity (FR)",
+          "type": "stat"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "description": "Power Usage Effectiveness — average across Scaleway's 4 Paris DCs (2024). Range across DCs is 1.25 (DC5) → 1.45 (DC2); mapping zone↔DC isn't published. AWS dashboard hardcodes 1.135 for comparison.",
+          "fieldConfig": {
+            "defaults": {
+              "unit": "none",
+              "decimals": 2
+            }
+          },
+          "gridPos": {
+            "h": 5,
+            "w": 6,
+            "x": 12,
+            "y": 5
+          },
+          "id": 3,
+          "options": {
+            "colorMode": "none",
+            "graphMode": "none",
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ]
+            }
+          },
+          "targets": [
+            {
+              "expr": "$PUE_scaleway",
+              "refId": "A"
+            }
+          ],
+          "title": "PUE (Paris avg)",
+          "type": "stat"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "description": "Embodied emissions amortized to the time range. 13 kgCO2eq/year per PRO2-S worker × 3 workers × 5 years = 195 kg lifetime; pro-rated to the dashboard time range. Boavizta API — range 8–23 kg/yr (uncertainty is real).",
+          "fieldConfig": {
+            "defaults": {
+              "unit": "kgCO2eq",
+              "decimals": 3,
+              "custom": {
+                "displayName": "kgCO2eq"
+              }
+            }
+          },
+          "gridPos": {
+            "h": 5,
+            "w": 6,
+            "x": 18,
+            "y": 5
+          },
+          "id": 4,
+          "options": {
+            "colorMode": "value",
+            "graphMode": "area",
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ]
+            }
+          },
+          "targets": [
+            {
+              "expr": "($__range_s/$seconds_five_years) * $embodied_kg_5yr",
+              "refId": "A"
+            }
+          ],
+          "title": "Embodied (M)",
+          "type": "stat"
+        },
+        {
+          "type": "row",
+          "id": 102,
+          "title": "Comparison — totals over selected range",
+          "gridPos": {
+            "h": 1,
+            "w": 24,
+            "x": 0,
+            "y": 10
+          },
+          "collapsed": false
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "description": "Total SCI from KEIT-side composition: (Energy × Grid intensity × PUE) + Embodied. Computed in the dashboard's variables.",
+          "fieldConfig": {
+            "defaults": {
+              "unit": "kgCO2eq",
+              "decimals": 3,
+              "custom": {
+                "displayName": "kgCO2eq"
+              },
+              "color": {
+                "mode": "fixed",
+                "fixedColor": "blue"
+              }
+            }
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 8,
+            "x": 0,
+            "y": 11
+          },
+          "id": 5,
+          "options": {
+            "colorMode": "value",
+            "graphMode": "area",
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ]
+            },
+            "textMode": "value_and_name"
+          },
+          "targets": [
+            {
+              "expr": "($Energy * $EnergyCarbonIntensity * $PUE_scaleway / 1000) + (($__range_s/$seconds_five_years) * $embodied_kg_5yr)",
+              "legendFormat": "KEIT-side SCI",
+              "refId": "A"
+            }
+          ],
+          "title": "KEIT-side SCI",
+          "type": "stat"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "description": "Scaleway's bundled total, scaled to match the dashboard time range. Math: average per day (over whichever report_dates the exporter currently has data for) × number of days in the dashboard range. This compensates for the exporter's rolling 14-day window so the value is apples-to-apples with the KEIT-side SCI (which integrates over the same range).",
+          "fieldConfig": {
+            "defaults": {
+              "unit": "kgCO2eq",
+              "decimals": 3,
+              "custom": {
+                "displayName": "kgCO2eq"
+              },
+              "color": {
+                "mode": "fixed",
+                "fixedColor": "orange"
+              }
+            }
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 8,
+            "x": 8,
+            "y": 11
+          },
+          "id": 6,
+          "options": {
+            "colorMode": "value",
+            "graphMode": "area",
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ]
+            },
+            "textMode": "value_and_name"
+          },
+          "targets": [
+            {
+              "expr": "(sum(keit_scaleway_co2_kg{kubernetes_cluster=~\"$cluster\",project_name=~\"$project\"}) / count(count by (report_date) (keit_scaleway_co2_kg{kubernetes_cluster=~\"$cluster\",project_name=~\"$project\"}))) * ($__range_s / 86400)",
+              "legendFormat": "Scaleway bundled",
+              "refId": "A"
+            }
+          ],
+          "title": "Scaleway-side bundled",
+          "type": "stat"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "description": "Ratio Scaleway / KEIT. > 1 means Scaleway reports higher than the KEIT computation; < 1 means lower. Difference is methodology + scope, not 'one is right.'",
+          "fieldConfig": {
+            "defaults": {
+              "unit": "percentunit",
+              "decimals": 2
+            }
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 8,
+            "x": 16,
+            "y": 11
+          },
+          "id": 7,
+          "options": {
+            "colorMode": "value",
+            "graphMode": "none",
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ]
+            }
+          },
+          "targets": [
+            {
+              "expr": "((sum(keit_scaleway_co2_kg{kubernetes_cluster=~\"$cluster\",project_name=~\"$project\"}) / count(count by (report_date) (keit_scaleway_co2_kg{kubernetes_cluster=~\"$cluster\",project_name=~\"$project\"}))) * ($__range_s / 86400)) / (($Energy * $EnergyCarbonIntensity * $PUE_scaleway / 1000) + (($__range_s/$seconds_five_years) * $embodied_kg_5yr))",
+              "refId": "A"
+            }
+          ],
+          "title": "Scaleway / KEIT ratio",
+          "type": "stat"
+        },
+        {
+          "type": "row",
+          "id": 103,
+          "title": "Daily side-by-side (the money slide)",
+          "gridPos": {
+            "h": 1,
+            "w": 24,
+            "x": 0,
+            "y": 19
+          },
+          "collapsed": false
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "description": "Scaleway daily total. Sum across all SKUs for each report_date emitted by the exporter — the rolling 14-day window naturally fits this view.",
+          "fieldConfig": {
+            "defaults": {
+              "unit": "kgCO2eq",
+              "decimals": 3,
+              "custom": {
+                "drawStyle": "bars",
+                "fillOpacity": 80,
+                "displayName": "Scaleway kgCO2eq",
+                "lineInterpolation": "stepAfter"
+              },
+              "color": {
+                "mode": "fixed",
+                "fixedColor": "orange"
+              }
+            }
+          },
+          "gridPos": {
+            "h": 9,
+            "w": 12,
+            "x": 0,
+            "y": 20
+          },
+          "id": 8,
+          "options": {
+            "legend": {
+              "displayMode": "list",
+              "placement": "bottom"
+            },
+            "tooltip": {
+              "mode": "multi"
+            }
+          },
+          "targets": [
+            {
+              "expr": "sum by (report_date) (keit_scaleway_co2_kg{kubernetes_cluster=~\"$cluster\",project_name=~\"$project\"})",
+              "legendFormat": "{{report_date}}",
+              "refId": "A"
+            }
+          ],
+          "title": "Scaleway — daily kg by report_date",
+          "type": "barchart"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "description": "KEIT-side instantaneous gCO2eq/hour rate from Kepler × grid intensity × PUE. Cumulative integration of this curve over a day approximates that day's operational SCI. Embodied (~4.45 g/h cluster) is added as a flat baseline. Kept in grams here because per-hour values in kg would be unreadably small.",
+          "fieldConfig": {
+            "defaults": {
+              "unit": "short",
+              "decimals": 1,
+              "custom": {
+                "drawStyle": "line",
+                "fillOpacity": 25,
+                "displayName": "KEIT-SCI gCO2eq/h"
+              },
+              "color": {
+                "mode": "fixed",
+                "fixedColor": "blue"
+              }
+            }
+          },
+          "gridPos": {
+            "h": 9,
+            "w": 12,
+            "x": 12,
+            "y": 20
+          },
+          "id": 9,
+          "options": {
+            "legend": {
+              "displayMode": "list",
+              "placement": "bottom"
+            },
+            "tooltip": {
+              "mode": "multi"
+            }
+          },
+          "targets": [
+            {
+              "expr": "(sum(rate(kepler_container_joules_total{kubernetes_cluster=~\"$cluster\"}[5m])) * 0.000000277777777777778 * 3600 * scalar(avg(grid_intensity_carbon_average{kubernetes_cluster=~\"$cluster\",job=\"prometheus.scrape.annotated_pods\"})) * $PUE_scaleway) + ($embodied_kg_5yr * 1000 / ($seconds_five_years/3600))",
+              "legendFormat": "KEIT-SCI gCO2eq/h (op + embodied)",
+              "refId": "A"
+            }
+          ],
+          "title": "KEIT-SCI — instantaneous gCO2eq per hour",
+          "type": "timeseries"
+        },
+        {
+          "type": "row",
+          "id": 104,
+          "title": "What each side measures (decomposition)",
+          "gridPos": {
+            "h": 1,
+            "w": 24,
+            "x": 0,
+            "y": 29
+          },
+          "collapsed": false
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "description": "Operational vs embodied as a fraction of total KEIT-side SCI. For most workloads on managed K8s the operational portion dominates; embodied scales with hardware count + lifetime, not utilization.",
+          "fieldConfig": {
+            "defaults": {
+              "unit": "percent",
+              "decimals": 1
+            }
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 0,
+            "y": 30
+          },
+          "id": 10,
+          "options": {
+            "legend": {
+              "displayMode": "table",
+              "placement": "right",
+              "values": [
+                "value",
+                "percent"
+              ]
+            },
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ]
+            }
+          },
+          "targets": [
+            {
+              "expr": "($Energy * $EnergyCarbonIntensity * $PUE_scaleway / 1000)",
+              "legendFormat": "Operational (E × I × PUE)",
+              "refId": "A"
+            },
+            {
+              "expr": "($__range_s/$seconds_five_years) * $embodied_kg_5yr",
+              "legendFormat": "Embodied (M)",
+              "refId": "B"
+            }
+          ],
+          "title": "KEIT-side: operational vs embodied",
+          "type": "piechart"
+        },
+        {
+          "datasource": {
+            "type": "prometheus",
+            "uid": "${DS_PROMETHEUS}"
+          },
+          "description": "Scaleway's bundled figure broken out by service category. Reminder: this includes embodied + operational + lifecycle, attribution per ADEME methodology — we don't get the split.",
+          "fieldConfig": {
+            "defaults": {
+              "unit": "kgCO2eq",
+              "decimals": 1
+            }
+          },
+          "gridPos": {
+            "h": 8,
+            "w": 12,
+            "x": 12,
+            "y": 30
+          },
+          "id": 11,
+          "options": {
+            "legend": {
+              "displayMode": "table",
+              "placement": "right",
+              "values": [
+                "value",
+                "percent"
+              ]
+            },
+            "reduceOptions": {
+              "calcs": [
+                "lastNotNull"
+              ]
+            }
+          },
+          "targets": [
+            {
+              "expr": "(sum by (service_category) (keit_scaleway_co2_kg{kubernetes_cluster=~\"$cluster\",project_name=~\"$project\"}) / scalar(count(count by (report_date) (keit_scaleway_co2_kg{kubernetes_cluster=~\"$cluster\",project_name=~\"$project\"})))) * ($__range_s / 86400)",
+              "legendFormat": "{{service_category}}",
+              "refId": "A"
+            }
+          ],
+          "title": "Scaleway-side: by service category (bundled)",
+          "type": "piechart"
+        }
+      ],
+      "__inputs": [
+        {
+          "name": "DS_PROMETHEUS",
+          "label": "Prometheus / Mimir",
+          "description": "Prometheus-compatible datasource (Mimir, Cortex, Thanos, or vanilla Prometheus) where the KEIT metrics are ingested.",
+          "type": "datasource",
+          "pluginId": "prometheus",
+          "pluginName": "Prometheus"
+        }
+      ],
+      "__requires": [
+        {
+          "type": "grafana",
+          "id": "grafana",
+          "name": "Grafana",
+          "version": "9.0.0"
+        },
+        {
+          "type": "datasource",
+          "id": "prometheus",
+          "name": "Prometheus",
+          "version": "1.0.0"
+        }
+      ],
+      "uid": "keit-scaleway-vs-sci-comparison"
+    }

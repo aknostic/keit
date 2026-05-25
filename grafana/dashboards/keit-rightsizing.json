@@ -1,0 +1,989 @@
+{
+  "title": "KEIT — Cluster Right-Sizing (Kepler + kube-state-metrics)",
+  "tags": [
+    "keit",
+    "sustainability",
+    "kepler",
+    "rightsizing",
+    "findings",
+    "reusable"
+  ],
+  "editable": true,
+  "schemaVersion": 39,
+  "refresh": "5m",
+  "time": {
+    "from": "now-24h",
+    "to": "now"
+  },
+  "templating": {
+    "list": [
+      {
+        "datasource": {
+          "type": "prometheus",
+          "uid": "${DS_PROMETHEUS}"
+        },
+        "definition": "label_values(kepler_container_joules_total, kubernetes_cluster)",
+        "includeAll": false,
+        "multi": false,
+        "label": "Cluster",
+        "name": "cluster",
+        "query": "label_values(kepler_container_joules_total, kubernetes_cluster)",
+        "refresh": 2,
+        "type": "query"
+      },
+      {
+        "datasource": {
+          "type": "prometheus",
+          "uid": "${DS_PROMETHEUS}"
+        },
+        "definition": "label_values(kepler_container_joules_total{kubernetes_cluster=\"$cluster\"}, container_namespace)",
+        "includeAll": true,
+        "allValue": ".+",
+        "multi": true,
+        "label": "Namespace",
+        "name": "namespace",
+        "query": "label_values(kepler_container_joules_total{kubernetes_cluster=\"$cluster\"}, container_namespace)",
+        "refresh": 2,
+        "type": "query"
+      }
+    ]
+  },
+  "panels": [
+    {
+      "type": "text",
+      "id": 100,
+      "gridPos": {
+        "h": 7,
+        "w": 24,
+        "x": 0,
+        "y": 0
+      },
+      "options": {
+        "mode": "markdown",
+        "content": "> ℹ️ **Reusable dashboard from KEIT** — see [github.com/aknostic/keit/grafana/dashboards](https://github.com/aknostic/keit/tree/main/grafana/dashboards) for the source and other reusable dashboards.\n\n## What workloads are heavy, and what is wildly over-provisioned?\n\nKepler on a VM is **estimating**, not measuring (typically labels 70% of energy as kernel/system). But its **relative pod rankings** are useful, and combined with kube-state-metrics, you get a real right-sizing tool.\n\n**How to read this dashboard:**\n- **Top consumers section** — averaged over the dashboard time range. A heavy pod and a heavy namespace are different questions: per-pod tells you what to right-size; per-namespace tells you who to talk to.\n- **Right-sizing candidates** — ranked by ABSOLUTE waste (e.g., 'pod X wastes 800 MiB of requested memory'), not by utilisation %. A small pod at 1% util wastes very little; a big pod at 30% util can waste GiBs. The actionable wins are at the top of the absolute list. CPU uses 24h averages to avoid misclassifying bursty CronJobs.\n- **No CPU request set** — these pods are scheduling-unstable AND invisible to Kepler's ratio-based attribution.\n- **7-day cumulative energy** — for capacity planning. Different question than instantaneous power: a pod with steady moderate energy can cost more over a week than one that briefly spikes high.\n\n⚠️ **Don't read this dashboard mechanically.** A low-utilisation pod might be a Postgres standby waiting for failover — it's doing its job. Right-sizing is a conversation, not a script.\n\n**Designed to be reusable**: drop into any cluster running Kepler + kube-state-metrics + cadvisor."
+      }
+    },
+    {
+      "type": "row",
+      "id": 101,
+      "title": "Cluster energy overview",
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 7
+      },
+      "collapsed": false
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "description": "Average instantaneous power draw for the whole cluster according to Kepler. Sane VMs are 50–500W per node, so a 3-node cluster usually lands 300–1500W.",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "watt",
+          "decimals": 0
+        }
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 8,
+        "x": 0,
+        "y": 8
+      },
+      "id": 1,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "reduceOptions": {
+          "calcs": [
+            "mean"
+          ]
+        }
+      },
+      "targets": [
+        {
+          "expr": "sum(rate(kepler_node_platform_joules_total{kubernetes_cluster=\"$cluster\"}[5m]))",
+          "refId": "A"
+        }
+      ],
+      "title": "Cluster total power (avg over range)",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "description": "Fraction of cluster energy Kepler can attribute to specific pods (mode=dynamic). The rest is labeled 'kernel' and 'system' — unattributable VM overhead. On a VM, 12–30% pod-attribution is typical. Low number = Kepler limitations, not your workload.",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "percentunit",
+          "decimals": 1,
+          "max": 1,
+          "min": 0,
+          "thresholds": {
+            "mode": "absolute",
+            "steps": [
+              {
+                "color": "red",
+                "value": null
+              },
+              {
+                "color": "yellow",
+                "value": 0.1
+              },
+              {
+                "color": "green",
+                "value": 0.25
+              }
+            ]
+          }
+        }
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 8,
+        "x": 8,
+        "y": 8
+      },
+      "id": 2,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        }
+      },
+      "targets": [
+        {
+          "expr": "sum(rate(kepler_container_joules_total{kubernetes_cluster=\"$cluster\",mode=\"dynamic\",container_namespace!=\"kernel\",container_namespace!=\"system\"}[5m])) / sum(rate(kepler_container_joules_total{kubernetes_cluster=\"$cluster\",mode=\"dynamic\"}[5m]))",
+          "refId": "A"
+        }
+      ],
+      "title": "% energy attributable to pods (vs kernel/system)",
+      "type": "stat"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "description": "Active pods Kepler is measuring. Sudden drops mean pods were evicted or removed — useful as a sanity check after decommissioning a workload. Example: on 2026-05-15 this metric dropped from ~80 to ~53 when our team migrated GitLab off this cluster.",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short",
+          "decimals": 0
+        }
+      },
+      "gridPos": {
+        "h": 5,
+        "w": 8,
+        "x": 16,
+        "y": 8
+      },
+      "id": 3,
+      "options": {
+        "colorMode": "value",
+        "graphMode": "area",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        }
+      },
+      "targets": [
+        {
+          "expr": "count(count by (pod_name)(kepler_container_joules_total{kubernetes_cluster=\"$cluster\",mode=\"dynamic\",container_namespace!=\"kernel\",container_namespace!=\"system\"}))",
+          "refId": "A"
+        }
+      ],
+      "title": "Pods measured by Kepler",
+      "type": "stat"
+    },
+    {
+      "type": "row",
+      "id": 102,
+      "title": "Top consumers (Kepler-ranked)",
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 13
+      },
+      "collapsed": false
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "description": "Top 15 pods by average power over the dashboard time range. Kepler's relative rankings are useful even when absolute values are noisy on VMs: a pod ranked #1 IS your heaviest workload. Investigate the top 3 — are they right-sized for the work they do?",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "watt",
+          "decimals": 3
+        }
+      },
+      "gridPos": {
+        "h": 14,
+        "w": 24,
+        "x": 0,
+        "y": 14
+      },
+      "id": 4,
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        }
+      },
+      "targets": [
+        {
+          "expr": "topk(15, avg_over_time(sum by (container_namespace, pod_name) (rate(kepler_container_joules_total{kubernetes_cluster=\"$cluster\",mode=\"dynamic\",container_namespace=~\"$namespace\",container_namespace!=\"kernel\",container_namespace!=\"system\"}[5m]))[$__range:5m]))",
+          "legendFormat": "{{container_namespace}} / {{pod_name}}",
+          "refId": "A"
+        }
+      ],
+      "title": "Top 15 pods by power (average over range, W)",
+      "type": "barchart"
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "description": "Same Kepler data aggregated by namespace. Different question than the per-pod chart above: which app/team uses the most? A namespace with many moderate pods (e.g. gitlab with its many runners + workers) can dominate this chart even when no single pod is in the per-pod top 15. Conversely, plausible has 1–2 heavy pods but a smaller namespace total. Both views complement each other — use per-pod for right-sizing, per-namespace for chargeback / team conversations.",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "watt",
+          "decimals": 2
+        }
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 24,
+        "x": 0,
+        "y": 28
+      },
+      "id": 5,
+      "options": {
+        "legend": {
+          "displayMode": "table",
+          "placement": "right",
+          "values": [
+            "value",
+            "percent"
+          ]
+        },
+        "reduceOptions": {
+          "calcs": [
+            "mean"
+          ]
+        },
+        "pieType": "donut"
+      },
+      "targets": [
+        {
+          "expr": "sum by (container_namespace) (rate(kepler_container_joules_total{kubernetes_cluster=\"$cluster\",mode=\"dynamic\",container_namespace=~\"$namespace\",container_namespace!=\"kernel\",container_namespace!=\"system\"}[5m]))",
+          "legendFormat": "{{container_namespace}}",
+          "refId": "A"
+        }
+      ],
+      "title": "Power by namespace (average over range)",
+      "type": "piechart"
+    },
+    {
+      "type": "row",
+      "id": 103,
+      "title": "Right-sizing candidates (the actionable section)",
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 36
+      },
+      "collapsed": false
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "description": "Top 15 CPU **waste** candidates — ranked by ABSOLUTE millicores wasted (request minus 24h-avg actual usage), not utilisation %. This surfaces big absolute wins like 'Envoy Gateway wasting 100m' rather than tiny pods at low utilisation. Util% column shown for context: a pod at 5% utilisation wastes more proportionally, but a pod at 30% util can still waste more in absolute terms if it has a huge request. Uses 24h average so a bursty CronJob with headroom isn't misclassified.\n\n⚠️ **Don't blindly cut**: a replica with low utilisation may need full capacity when promoted (Postgres standbys, Redis replicas, etc.). A pod waiting for failover is doing its job. Always check what the pod's role is before reducing requests.",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "right"
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Wasted (millicores)"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "none"
+              },
+              {
+                "id": "decimals",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Util %"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "percent"
+              },
+              {
+                "id": "decimals",
+                "value": 1
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-background",
+                  "mode": "gradient"
+                }
+              },
+              {
+                "id": "color",
+                "value": {
+                  "mode": "thresholds"
+                }
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "red",
+                      "value": null
+                    },
+                    {
+                      "color": "yellow",
+                      "value": 30
+                    },
+                    {
+                      "color": "green",
+                      "value": 60
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Namespace"
+            },
+            "properties": [
+              {
+                "id": "custom.align",
+                "value": "left"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Pod"
+            },
+            "properties": [
+              {
+                "id": "custom.align",
+                "value": "left"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 12,
+        "x": 0,
+        "y": 37
+      },
+      "id": 6,
+      "options": {
+        "showHeader": true,
+        "footer": {
+          "show": false
+        }
+      },
+      "targets": [
+        {
+          "expr": "topk(15, (sum by (namespace, pod) (kube_pod_container_resource_requests{kubernetes_cluster=\"$cluster\",resource=\"cpu\",namespace=~\"$namespace\"}) - sum by (namespace, pod) (avg_over_time(rate(container_cpu_usage_seconds_total{kubernetes_cluster=\"$cluster\",namespace=~\"$namespace\",container!=\"\",container!=\"POD\"}[5m])[24h:5m]))) * 1000)",
+          "format": "table",
+          "instant": true,
+          "refId": "A"
+        },
+        {
+          "expr": "sum by (namespace, pod) (avg_over_time(rate(container_cpu_usage_seconds_total{kubernetes_cluster=\"$cluster\",namespace=~\"$namespace\",container!=\"\",container!=\"POD\"}[5m])[24h:5m])) / sum by (namespace, pod) (kube_pod_container_resource_requests{kubernetes_cluster=\"$cluster\",resource=\"cpu\",namespace=~\"$namespace\"}) * 100",
+          "format": "table",
+          "instant": true,
+          "refId": "B"
+        }
+      ],
+      "title": "CPU waste — top 15 by absolute millicores wasted (24h avg)",
+      "type": "table",
+      "transformations": [
+        {
+          "id": "merge",
+          "options": {}
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time 1": true,
+              "Time 2": true
+            },
+            "renameByName": {
+              "namespace": "Namespace",
+              "pod": "Pod",
+              "Value #A": "Wasted (millicores)",
+              "Value #B": "Util %"
+            },
+            "indexByName": {
+              "namespace": 0,
+              "pod": 1,
+              "Value #A": 2,
+              "Value #B": 3
+            }
+          }
+        },
+        {
+          "id": "filterByValue",
+          "options": {
+            "filters": [
+              {
+                "fieldName": "Wasted (millicores)",
+                "config": {
+                  "id": "greater",
+                  "options": {
+                    "value": 0
+                  }
+                }
+              }
+            ],
+            "type": "include",
+            "match": "all"
+          }
+        },
+        {
+          "id": "sortBy",
+          "options": {
+            "fields": {},
+            "sort": [
+              {
+                "field": "Wasted (millicores)",
+                "desc": true
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "description": "Top 15 memory **waste** candidates — ranked by ABSOLUTE MiB wasted (request minus actual). Memory is usually the biggest win because requests bound the scheduler directly: 1 GiB requested but 50 MiB used means 950 MiB of node capacity is locked up for nothing. Util% column shown for context. Instantaneous usage; if a workload bursts to higher memory, the request might be justified.\n\n⚠️ **Don't blindly cut**: a replica with low utilisation may need full capacity when promoted (Postgres standbys, Redis replicas, etc.). A pod waiting for failover is doing its job. Always check what the pod's role is before reducing requests.",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "right"
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Wasted (MiB)"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "decmbytes"
+              },
+              {
+                "id": "decimals",
+                "value": 0
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Util %"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "percent"
+              },
+              {
+                "id": "decimals",
+                "value": 1
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-background",
+                  "mode": "gradient"
+                }
+              },
+              {
+                "id": "color",
+                "value": {
+                  "mode": "thresholds"
+                }
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "red",
+                      "value": null
+                    },
+                    {
+                      "color": "yellow",
+                      "value": 30
+                    },
+                    {
+                      "color": "green",
+                      "value": 60
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Namespace"
+            },
+            "properties": [
+              {
+                "id": "custom.align",
+                "value": "left"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Pod"
+            },
+            "properties": [
+              {
+                "id": "custom.align",
+                "value": "left"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 12,
+        "x": 12,
+        "y": 37
+      },
+      "id": 7,
+      "options": {
+        "showHeader": true,
+        "footer": {
+          "show": false
+        }
+      },
+      "targets": [
+        {
+          "expr": "topk(15, (sum by (namespace, pod) (kube_pod_container_resource_requests{kubernetes_cluster=\"$cluster\",resource=\"memory\",namespace=~\"$namespace\"}) - sum by (namespace, pod) (container_memory_working_set_bytes{kubernetes_cluster=\"$cluster\",namespace=~\"$namespace\",container!=\"\",container!=\"POD\"})) / 1024 / 1024)",
+          "format": "table",
+          "instant": true,
+          "refId": "A"
+        },
+        {
+          "expr": "sum by (namespace, pod) (container_memory_working_set_bytes{kubernetes_cluster=\"$cluster\",namespace=~\"$namespace\",container!=\"\",container!=\"POD\"}) / sum by (namespace, pod) (kube_pod_container_resource_requests{kubernetes_cluster=\"$cluster\",resource=\"memory\",namespace=~\"$namespace\"}) * 100",
+          "format": "table",
+          "instant": true,
+          "refId": "B"
+        }
+      ],
+      "title": "Memory waste — top 15 by absolute MiB wasted",
+      "type": "table",
+      "transformations": [
+        {
+          "id": "merge",
+          "options": {}
+        },
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time 1": true,
+              "Time 2": true
+            },
+            "renameByName": {
+              "namespace": "Namespace",
+              "pod": "Pod",
+              "Value #A": "Wasted (MiB)",
+              "Value #B": "Util %"
+            },
+            "indexByName": {
+              "namespace": 0,
+              "pod": 1,
+              "Value #A": 2,
+              "Value #B": 3
+            }
+          }
+        },
+        {
+          "id": "filterByValue",
+          "options": {
+            "filters": [
+              {
+                "fieldName": "Wasted (MiB)",
+                "config": {
+                  "id": "greater",
+                  "options": {
+                    "value": 0
+                  }
+                }
+              }
+            ],
+            "type": "include",
+            "match": "all"
+          }
+        },
+        {
+          "id": "sortBy",
+          "options": {
+            "fields": {},
+            "sort": [
+              {
+                "field": "Wasted (MiB)",
+                "desc": true
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "description": "Pods using MORE CPU than requested (util > 100%). They're stealing CPU from neighbours and risk throttling or eviction under load. **Action: INCREASE their CPU requests** so the scheduler can plan for them. Common cause: someone copied a Helm chart's default and never tuned it. Note: extreme percentages (1000%+) usually mean a tiny request like 1m — bump to a sane number like 50m or 100m.",
+      "fieldConfig": {
+        "defaults": {
+          "custom": {
+            "align": "right"
+          }
+        },
+        "overrides": [
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Util %"
+            },
+            "properties": [
+              {
+                "id": "unit",
+                "value": "percent"
+              },
+              {
+                "id": "decimals",
+                "value": 0
+              },
+              {
+                "id": "custom.cellOptions",
+                "value": {
+                  "type": "color-background",
+                  "mode": "gradient"
+                }
+              },
+              {
+                "id": "color",
+                "value": {
+                  "mode": "thresholds"
+                }
+              },
+              {
+                "id": "thresholds",
+                "value": {
+                  "mode": "absolute",
+                  "steps": [
+                    {
+                      "color": "green",
+                      "value": null
+                    },
+                    {
+                      "color": "yellow",
+                      "value": 100
+                    },
+                    {
+                      "color": "red",
+                      "value": 200
+                    }
+                  ]
+                }
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Namespace"
+            },
+            "properties": [
+              {
+                "id": "custom.align",
+                "value": "left"
+              }
+            ]
+          },
+          {
+            "matcher": {
+              "id": "byName",
+              "options": "Pod"
+            },
+            "properties": [
+              {
+                "id": "custom.align",
+                "value": "left"
+              }
+            ]
+          }
+        ]
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 24,
+        "x": 0,
+        "y": 47
+      },
+      "id": 10,
+      "options": {
+        "showHeader": true,
+        "footer": {
+          "show": false
+        }
+      },
+      "targets": [
+        {
+          "expr": "topk(15, sum by (namespace, pod) (avg_over_time(rate(container_cpu_usage_seconds_total{kubernetes_cluster=\"$cluster\",namespace=~\"$namespace\",container!=\"\",container!=\"POD\"}[5m])[24h:5m])) / sum by (namespace, pod) (kube_pod_container_resource_requests{kubernetes_cluster=\"$cluster\",resource=\"cpu\",namespace=~\"$namespace\"}) * 100)",
+          "format": "table",
+          "instant": true,
+          "refId": "A"
+        }
+      ],
+      "title": "CPU UNDER-provisioned pods (util > 100%) — bump these requests up",
+      "type": "table",
+      "transformations": [
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true
+            },
+            "renameByName": {
+              "namespace": "Namespace",
+              "pod": "Pod",
+              "Value": "Util %"
+            },
+            "indexByName": {
+              "namespace": 0,
+              "pod": 1,
+              "Value": 2
+            }
+          }
+        },
+        {
+          "id": "filterByValue",
+          "options": {
+            "filters": [
+              {
+                "fieldName": "Util %",
+                "config": {
+                  "id": "greater",
+                  "options": {
+                    "value": 100
+                  }
+                }
+              }
+            ],
+            "type": "include",
+            "match": "all"
+          }
+        },
+        {
+          "id": "sortBy",
+          "options": {
+            "fields": {},
+            "sort": [
+              {
+                "field": "Util %",
+                "desc": true
+              }
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "description": "Pods with NO CPU request set. They schedule on kernel-default priority — get evicted under pressure, may starve under load. Also invisible to Kepler's ratio-based attribution. Two reliability bugs in one.",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "short"
+        }
+      },
+      "gridPos": {
+        "h": 10,
+        "w": 24,
+        "x": 0,
+        "y": 57
+      },
+      "id": 8,
+      "options": {
+        "showHeader": true
+      },
+      "targets": [
+        {
+          "expr": "topk(30, group by (namespace, pod, container) (kube_pod_container_info{kubernetes_cluster=\"$cluster\",namespace=~\"$namespace\"}) unless on (namespace, pod, container) group by (namespace, pod, container) (kube_pod_container_resource_requests{kubernetes_cluster=\"$cluster\",resource=\"cpu\"}))",
+          "format": "table",
+          "instant": true,
+          "refId": "A"
+        }
+      ],
+      "title": "Containers without a CPU request set",
+      "type": "table",
+      "transformations": [
+        {
+          "id": "organize",
+          "options": {
+            "excludeByName": {
+              "Time": true,
+              "Value": true
+            },
+            "renameByName": {
+              "namespace": "Namespace",
+              "pod": "Pod",
+              "container": "Container"
+            }
+          }
+        }
+      ]
+    },
+    {
+      "type": "row",
+      "id": 104,
+      "title": "7-day cumulative energy (for steady-state planning)",
+      "gridPos": {
+        "h": 1,
+        "w": 24,
+        "x": 0,
+        "y": 67
+      },
+      "collapsed": false
+    },
+    {
+      "datasource": {
+        "type": "prometheus",
+        "uid": "${DS_PROMETHEUS}"
+      },
+      "description": "Total ENERGY (watt-hours) consumed by each pod over the last 7 days. Different from 'instantaneous power' above: a pod averaging 5W for 7 days uses 5×168 = 840 Wh; a pod that briefly spiked to 50W for 1h uses only 50 Wh. This view is for capacity planning — 'what's my weekly energy bill per workload?' — and shows which pods cost the most over time, even if they don't appear high on the current-power chart.",
+      "fieldConfig": {
+        "defaults": {
+          "unit": "watth",
+          "decimals": 1
+        }
+      },
+      "gridPos": {
+        "h": 14,
+        "w": 24,
+        "x": 0,
+        "y": 68
+      },
+      "id": 9,
+      "options": {
+        "legend": {
+          "displayMode": "list",
+          "placement": "bottom"
+        },
+        "orientation": "horizontal",
+        "reduceOptions": {
+          "calcs": [
+            "lastNotNull"
+          ]
+        }
+      },
+      "targets": [
+        {
+          "expr": "topk(15, sum by (container_namespace, pod_name) (increase(kepler_container_joules_total{kubernetes_cluster=\"$cluster\",mode=\"dynamic\",container_namespace=~\"$namespace\",container_namespace!=\"kernel\",container_namespace!=\"system\"}[7d])) / 3600)",
+          "legendFormat": "{{container_namespace}} / {{pod_name}}",
+          "refId": "A"
+        }
+      ],
+      "title": "Top 15 pods by 7-day energy (Wh)",
+      "type": "barchart"
+    }
+  ],
+  "__inputs": [
+    {
+      "name": "DS_PROMETHEUS",
+      "label": "Prometheus / Mimir",
+      "description": "Prometheus-compatible datasource (Mimir, Cortex, Thanos, or vanilla Prometheus) where the KEIT metrics are ingested.",
+      "type": "datasource",
+      "pluginId": "prometheus",
+      "pluginName": "Prometheus"
+    }
+  ],
+  "__requires": [
+    {
+      "type": "grafana",
+      "id": "grafana",
+      "name": "Grafana",
+      "version": "9.0.0"
+    },
+    {
+      "type": "datasource",
+      "id": "prometheus",
+      "name": "Prometheus",
+      "version": "1.0.0"
+    }
+  ],
+  "uid": "keit-rightsizing"
+}

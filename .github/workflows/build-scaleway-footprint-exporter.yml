@@ -1,0 +1,102 @@
+# Build and publish the scaleway-footprint-exporter container image to GHCR.
+#
+# This is separate from build-and-docker.yml, which builds the unrelated root
+# `keit` image. Triggered only by pushing a scaleway-footprint-exporter-v*
+# tag, or manually via workflow_dispatch.
+name: Build and Publish scaleway-footprint-exporter
+
+on:
+  push:
+    tags:
+      - 'scaleway-footprint-exporter-v*'
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Image version to build and publish (e.g. 0.2.1)'
+        required: false
+        type: string
+
+permissions:
+  contents: read
+  packages: write
+
+env:
+  IMAGE_NAME: ghcr.io/aknostic/scaleway-footprint-exporter
+
+jobs:
+  build-and-publish:
+    runs-on: ubuntu-24.04
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Determine image version
+        id: version
+        env:
+          INPUT_TAG: ${{ inputs.tag }}
+          REF_NAME: ${{ github.ref_name }}
+          EVENT_NAME: ${{ github.event_name }}
+        run: |
+          if [[ "$EVENT_NAME" == "workflow_dispatch" ]]; then
+            VERSION="$INPUT_TAG"
+          else
+            VERSION="${REF_NAME#scaleway-footprint-exporter-v}"
+          fi
+
+          if [[ -z "$VERSION" ]]; then
+            echo "::error::Could not determine an image version (empty). For workflow_dispatch, provide the 'tag' input. For a tag push, the tag must match scaleway-footprint-exporter-v<version>."
+            exit 1
+          fi
+
+          echo "Resolved version: $VERSION"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
+      - name: Guard against overwriting an existing tag
+        id: guard
+        env:
+          VERSION: ${{ steps.version.outputs.version }}
+        run: |
+          REPO="aknostic/scaleway-footprint-exporter"
+
+          TOKEN=$(curl -fsSL "https://ghcr.io/token?scope=repository:${REPO}:pull" | jq -r '.token' 2>/dev/null || true)
+
+          if [[ -z "$TOKEN" || "$TOKEN" == "null" ]]; then
+            echo "::warning::Could not obtain a GHCR pull token to check existing tags; proceeding without the guard."
+            exit 0
+          fi
+
+          RESPONSE=$(curl -fsSL -H "Authorization: Bearer ${TOKEN}" "https://ghcr.io/v2/${REPO}/tags/list" 2>/dev/null || true)
+
+          if [[ -z "$RESPONSE" ]]; then
+            echo "::warning::Could not reach the GHCR tags API to check for an existing '${VERSION}' tag; proceeding without the guard."
+            exit 0
+          fi
+
+          if echo "$RESPONSE" | jq -e --arg v "$VERSION" '(.tags // []) | index($v) != null' >/dev/null 2>&1; then
+            echo "::error::Tag ${IMAGE_NAME}:${VERSION} already exists. Refusing to overwrite a published image; bump the version instead."
+            exit 1
+          fi
+
+          echo "Tag ${VERSION} not found on GHCR; safe to publish."
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push image
+        uses: docker/build-push-action@v6
+        with:
+          context: ./scaleway-footprint-exporter
+          platforms: linux/amd64
+          push: true
+          tags: ${{ env.IMAGE_NAME }}:${{ steps.version.outputs.version }}
+          labels: |
+            org.opencontainers.image.revision=${{ github.sha }}
+            org.opencontainers.image.source=https://github.com/aknostic/keit
+            org.opencontainers.image.version=${{ steps.version.outputs.version }}

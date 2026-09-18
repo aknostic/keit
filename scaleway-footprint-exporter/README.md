@@ -55,12 +55,25 @@ docker build -t scaleway-footprint-exporter .
 docker run -p 8080:8080 -e SCW_ORG_ID -e SCW_SECRET_KEY scaleway-footprint-exporter
 ```
 
+## Releasing (publishing a new image)
+
+CI publishes the image; nobody needs to `docker push` by hand.
+
+1. Bump `version` and `appVersion` in [`helm/Chart.yaml`](helm/Chart.yaml) to the new version, e.g. `0.2.1`.
+2. Push a tag named `scaleway-footprint-exporter-v<version>`, e.g.:
+   ```bash
+   git tag scaleway-footprint-exporter-v0.2.1
+   git push origin scaleway-footprint-exporter-v0.2.1
+   ```
+3. The `Build and Publish scaleway-footprint-exporter` GitHub Actions workflow builds the image from this directory's `Dockerfile` (`linux/amd64`, matching the Dockerfile's hardcoded `GOARCH=amd64`) and pushes `ghcr.io/aknostic/scaleway-footprint-exporter:<version>` to GHCR. It refuses to overwrite a tag that already exists.
+4. The workflow can also be run manually (`workflow_dispatch`) with a `tag` input, for rebuilding a version without pushing a new git tag.
+
 ## Deploy to Kubernetes
 
 Two paths are supported — pick whichever matches your tooling:
 
-- **Helm chart** (recommended) → [`helm/`](helm/README.md). Idiomatic install, parameterized via `values.yaml`, plays well with Flux `HelmRelease` and ArgoCD `Application`.
-- **Raw manifests** → [`manifests/`](#raw-manifests). For users on plain `kubectl apply` or who prefer to vendor and patch the YAML themselves.
+- **Helm chart** (recommended) → [`helm/`](helm/README.md). Idiomatic install, parameterized via `values.yaml`, plays well with Flux `HelmRelease` and ArgoCD `Application`. CI publishes `ghcr.io/aknostic/scaleway-footprint-exporter` (see [Releasing](#releasing-publishing-a-new-image)) and the chart's `values.yaml` already points at it, defaulting the tag to `.Chart.AppVersion` — no build step required, just `helm install`.
+- **Raw manifests** → [`manifests/`](#raw-manifests). For users on plain `kubectl apply` or who prefer to vendor and patch the YAML themselves. The published image works here too; only build your own if you need to vendor a modified image.
 
 Both routes support annotation-based scrape discovery (Alloy / Vector / classic Prometheus) and Prometheus Operator's `ServiceMonitor`.
 
@@ -81,10 +94,18 @@ All K8s manifests live in `manifests/`.
 ```bash
 export KUBECONFIG=/path/to/your/kubeconfig
 
-# 1. Build & push the image to a registry the cluster can pull from
-docker build -t <your-registry>/scaleway-footprint-exporter:dev .
-docker push  <your-registry>/scaleway-footprint-exporter:dev
-# Then update the image: line in manifests/deployment.yml.
+# 1. manifests/deployment.yml ships with a REPLACE_WITH_REGISTRY placeholder
+#    image, for people who intend to vendor/patch the raw manifests with
+#    their own build. To use the published image instead, edit the `image:`
+#    line in manifests/deployment.yml and point it at
+#    ghcr.io/aknostic/scaleway-footprint-exporter:0.2.1 (no build/push
+#    needed). Only build & push your own image if you're vendoring a
+#    modified one.
+#
+#    Note: the 0.2.1 tag becomes available on GHCR only after the
+#    scaleway-footprint-exporter-v0.2.1 release tag is pushed and its build
+#    workflow has run. Until then, use an existing tag such as 0.2.0 or
+#    latest.
 
 # 2. Namespace + Secret + Deployment + Service
 kubectl apply -f manifests/namespace.yml

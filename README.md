@@ -1,12 +1,24 @@
 # KEIT - Kubernetes Emissions Insights Tool
 
-KEIT is an open source tool which estimates the carbon emissions of a Kubernetes cluster. We have tested it on Kubernetes on bare metal and adapted to AWS' EKS and we are working on adapting it to work on Azure.
+KEIT is an open source tool which estimates the carbon emissions of a Kubernetes cluster.
+
+### Support matrix
+
+| Environment | Status | Notes |
+| --- | --- | --- |
+| Bare metal | ✅ Supported | Install Kepler chart `0.6.1` (see [Install Kepler](#install-kepler)). |
+| AWS EKS | ✅ Supported | Install Kepler chart `0.6.1`. Embodied emissions are retrieved dynamically. |
+| Scaleway Kapsule | ✅ Supported | Via the [Scaleway footprint exporter](scaleway-footprint-exporter). |
+| Azure AKS | 🚧 In progress | |
+| Google GKE | 📅 Planned | |
+
+On managed Kubernetes, nodes are virtual machines. Kepler v0.10 and later cannot report power inside a VM, so KEIT needs Kepler chart `0.6.1` there. [Install Kepler](#install-kepler) explains why.
 
 KEIT uses other open source projects to accomplish this:
 
 - [Kepler](https://github.com/sustainable-computing-io/kepler) for estimating the energy consumption of the running software.
 - [ElectricityMaps](https://app.electricitymaps.com/map/24h) to get the energy carbon intensity of the electricity consumed.
-- [grid-intensity-go](https://github.com/thegreenwebfoundation/grid-intensity-go)'s Prometheus exporter to get ElectriciyMaps data.
+- [grid-intensity-go](https://github.com/thegreenwebfoundation/grid-intensity-go)'s Prometheus exporter to get ElectricityMaps data.
 - [Boavizta API](https://doc.api.boavizta.org/) to get data about the embodied emissions of the hardware being used.
 - [Prometheus](https://prometheus.io/) to collect and store all this data.
 - [Grafana](https://grafana.com/) to visualize the data.
@@ -82,7 +94,7 @@ You can check that Prometheus is running:
 kubectl port-forward svc/prometheus-operated 9090:9090 -n prometheus
 ```
 
-and go to http://localhost:9093
+and go to http://localhost:9090
 
 And you can check that Grafana is running and check out the default dashboards:
 
@@ -99,13 +111,21 @@ The default login is `admin/prom-operator`.
 
 ### Install Kepler
 
+Install Kepler chart `0.6.1`, which runs Kepler 0.8.0, on every cluster, bare metal included:
+
 ```bash
 helm repo add kepler https://sustainable-computing-io.github.io/kepler-helm-chart
 helm repo update
-helm install kepler kepler/kepler --namespace kepler --create-namespace --set serviceMonitor.enabled=true --set serviceMonitor.labels.release=prometheus
+helm install kepler kepler/kepler --version 0.6.1 --namespace kepler --create-namespace --set serviceMonitor.enabled=true --set serviceMonitor.labels.release=prometheus
 ```
 
-You can get the kepler grafan dashboard from [here](https://github.com/sustainable-computing-io/kepler/blob/main/grafana-dashboards/Kepler-Exporter.json) and check the data you are getting.
+#### Why chart 0.6.1
+
+- **Managed Kubernetes (EKS, GKE, AKS, Kapsule).** Since Kepler v0.10, Kepler reports only energy measured through RAPL/powercap (or hwmon). A cloud VM does not expose those counters, so Kepler v0.10 and later gives no power figures there and the dashboards show "No data". Kepler 0.8.0 can still estimate power in a VM, which is what KEIT relies on there. Work on a VM power model for the current Kepler has started: see [kepler#2589](https://github.com/sustainable-computing-io/kepler/issues/2589) and the [draft proposal](https://github.com/sustainable-computing-io/kepler/blob/main/docs/developer/proposal/draft-20260417-VM-CPU-Power-Models-Training.md).
+- **Bare metal.** Kepler v0.12 can read RAPL and hwmon on bare metal, but KEIT does not support it yet. KEIT's queries use `kepler_container_joules_total`, which [Kepler documents](https://github.com/sustainable-computing-io/kepler/blob/main/docs/user/metrics.md) as `kepler_container_cpu_joules_total` in current releases (see also [kepler#2363](https://github.com/sustainable-computing-io/kepler/issues/2363)). Until KEIT is updated, stay on chart `0.6.1`.
+- **Why `0.6.1` and not a later chart.** The `kepler-helm-chart` repository is deprecated; Kepler now publishes its chart as an OCI artifact from the main Kepler repository. The last chart in the old repository, `0.6.2`, still runs Kepler 0.8.0 and is marked deprecated; the only difference from `0.6.1` is that flag.
+
+You can get the Kepler Grafana dashboard from [here](https://github.com/sustainable-computing-io/kepler/blob/main/grafana-dashboards/Kepler-Exporter.json) and check the data you are getting.
 
 ### Install grid-intensity-go exporter
 

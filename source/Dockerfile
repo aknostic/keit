@@ -1,5 +1,5 @@
 # Start with the official Golang image as the build environment
-FROM golang:1.26 AS builder
+FROM golang:1.27 AS builder
 
 # Set the working directory inside the container
 WORKDIR /app
@@ -17,7 +17,7 @@ COPY . .
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o /main .
 
 # Start a new stage from scratch
-FROM alpine:3.23
+FROM alpine:3.24
 
 # Install certificates for HTTPS support
 RUN apk add --no-cache ca-certificates

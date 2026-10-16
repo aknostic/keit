@@ -17,6 +17,40 @@ This means that to use KEIT you will need to install a few software components.
 ![KEIT components](/images/keit-components.png)
 
 
+## Quick install
+
+One command installs Kepler, the grid-intensity exporter and the KEIT dashboard. It also installs metrics-server and kube-prometheus-stack if your cluster does not have them yet. You need `kubectl` (pointing at the right cluster), `helm` and `git`, and three values:
+
+| Value | What it is |
+|---|---|
+| `--token` | Your [Electricity Maps API token](https://api-portal.electricitymaps.com/) (free tier). Better: `export ELECTRICITYMAPS_TOKEN=...` so it stays out of your shell history. |
+| `--zone` | Your Electricity Maps zone, for example `IE` for Ireland. List: `curl https://api.electricitymap.org/v3/zones`. |
+| `--pue` | The PUE of your data center, for example `1.2`. Or use `--provider aws\|gcp\|azure\|scaleway` for the value that provider publishes (see [Find or estimate the PUE](#find-or-estimate-the-pue-of-the-data-center)). |
+
+```bash
+git clone https://github.com/aknostic/keit.git && cd keit
+export ELECTRICITYMAPS_TOKEN=<your-token>
+./scripts/install.sh --zone IE --provider aws
+```
+
+Then open Grafana and look for the dashboard "Carbon intensity EKS - KEIT (Ierland)":
+
+```bash
+kubectl port-forward svc/prometheus-grafana 3000:80 -n prometheus
+```
+
+Go to http://127.0.0.1:3000. With a fresh kube-prometheus-stack the login is `admin` / `prom-operator`. Give Kepler and the exporter a few minutes to produce data.
+
+What the script does, in order: installs metrics-server if the metrics API is missing; installs kube-prometheus-stack if the Prometheus Operator is missing; installs Kepler 0.6.1 (Kepler 0.10 and later do not yet work on managed Kubernetes, see [the dashboard notes](grafana/dashboards/README.md#from-kepler-pre-010-rewrite--v080--chart-061)); installs the grid-intensity exporter v0.7.0; installs the Boavizta exporter if you pass `--provider aws`; and loads the dashboard, with your PUE, as a ConfigMap that Grafana's sidecar picks up. Run `./scripts/install.sh --help` for all options, and `--dry-run` to print the cluster-changing commands without running them. The steps below stay as reference if you want to install the parts yourself.
+
+### If you already run Prometheus
+
+The script does not change an existing Prometheus. It detects the Prometheus Operator and leaves the rest to you:
+
+- **Set `outOfOrderTimeWindow` to at least `3h`.** Electricity Maps returns an estimated value and a real value that can be a few hours old. Without this setting Prometheus rejects the older samples (`Error on ingesting samples that are too old`) and the carbon-intensity panels stay empty. With kube-prometheus-stack the value is `prometheus.prometheusSpec.tsdb.outOfOrderTimeWindow=3h`. More in [Note about Prometheus configuration](#note-about-prometheus-configuration).
+- **Make sure your Prometheus selects the ServiceMonitors.** They carry the label `release=prometheus`. If your kube-prometheus-stack release has another name, pass `--prometheus-release <name>`. If it is not in the `prometheus` namespace, pass `--prometheus-namespace <ns>`; the dashboard ConfigMap goes there.
+- **Grafana must run the dashboard sidecar** (the kube-prometheus-stack default), or import `grafana/KEIT_grafana_dashboard.json` by hand as described below.
+
 ## Installation
 
 The installation instructions assume you have a Kubernetes cluster up and running and that you can access it via `kubectl` command line.

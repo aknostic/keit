@@ -6,7 +6,7 @@ metadata:
   namespace: {{ .Release.Namespace }}
   labels:
     app.kubernetes.io/name: keit-servicemonitor
-    release: prometheus 
+    release: {{ .Values.servicemonitor.release }}
 spec:
   selector:
     matchLabels:

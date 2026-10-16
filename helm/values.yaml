@@ -46,3 +46,6 @@ servicemonitor:
 
   # scrapeTimeout specifies the scrape timeout duration for Prometheus metrics collection
   scrapeTimeout: 2m
+
+  # release specifies the Helm release name of kube-prometheus-stack, set as the "release" label so Prometheus selects the ServiceMonitor
+  release: prometheus

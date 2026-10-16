@@ -57,16 +57,17 @@ docker run -p 8080:8080 -e SCW_ORG_ID -e SCW_SECRET_KEY scaleway-footprint-expor
 
 ## Releasing (publishing a new image)
 
-CI publishes the image; nobody needs to `docker push` by hand.
+CI publishes the image; nobody needs to `docker push` by hand. Only repository admins (maintainers) can release: creating `scaleway-footprint-exporter-v*` tags is restricted by a tag ruleset. Pull requests that touch this directory get a build-only check; nothing is pushed.
 
-1. Bump `version` and `appVersion` in [`helm/Chart.yaml`](helm/Chart.yaml) to the new version, e.g. `0.2.1`.
-2. Push a tag named `scaleway-footprint-exporter-v<version>`, e.g.:
+1. Bump `version` and `appVersion` in [`helm/Chart.yaml`](helm/Chart.yaml) to the new version, e.g. `0.2.2`, and merge that to `main` through a pull request.
+2. On `main`, push a tag named `scaleway-footprint-exporter-v<version>`, e.g.:
    ```bash
-   git tag scaleway-footprint-exporter-v0.2.1
-   git push origin scaleway-footprint-exporter-v0.2.1
+   git switch main
+   git pull
+   git tag scaleway-footprint-exporter-v0.2.2
+   git push origin scaleway-footprint-exporter-v0.2.2
    ```
-3. The `Build and Publish scaleway-footprint-exporter` GitHub Actions workflow builds the image from this directory's `Dockerfile` (`linux/amd64`, matching the Dockerfile's hardcoded `GOARCH=amd64`) and pushes `ghcr.io/aknostic/scaleway-footprint-exporter:<version>` to GHCR. It refuses to overwrite a tag that already exists.
-4. The workflow can also be run manually (`workflow_dispatch`) with a `tag` input, for rebuilding a version without pushing a new git tag.
+3. The `Build and Publish scaleway-footprint-exporter` GitHub Actions workflow builds the image from this directory's `Dockerfile` (`linux/amd64`, matching the Dockerfile's hardcoded `GOARCH=amd64`) and pushes `ghcr.io/aknostic/scaleway-footprint-exporter:<version>` to GHCR. It stops if the tag is not on `main`, if the tag does not match `appVersion` in `helm/Chart.yaml`, or if the image tag already exists on GHCR.
 
 ## Deploy to Kubernetes
 

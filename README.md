@@ -22,6 +22,25 @@ This means that to use KEIT you will need to install a few software components.
 The installation instructions assume you have a Kubernetes cluster up and running and that you can access it via `kubectl` command line.
 They illustrate how to install the components manually with [Helm](https://helm.sh/), but you can adapt them to a GitOps method like ArgoCD, Flux, etc. 
 
+### Get the KEIT release
+
+The steps below use files from this repository (Helm values, manifests and dashboards). Check out a release tag so that they match the container images you install, and not whatever is currently on `main`:
+
+<!-- PLACEHOLDER: keit-v0.3.0 is not decided. Change it here and in the other places marked PLACEHOLDER. -->
+```bash
+git clone --branch keit-v0.3.0 --depth 1 https://github.com/aknostic/keit.git
+cd keit
+```
+
+Release notes for every version are on the [Releases page](https://github.com/aknostic/keit/releases). The container images are published to the GitHub Container Registry:
+
+| Component | Image | Release tag |
+| --- | --- | --- |
+| KEIT | `ghcr.io/aknostic/keit` | `keit-v<version>` |
+| Scaleway footprint exporter | `ghcr.io/aknostic/scaleway-footprint-exporter` | `scaleway-footprint-exporter-v<version>` |
+
+The Helm chart is in [`helm/`](helm) and is installed from the checkout. Run the commands in the following sections from the `keit` directory you just cloned.
+
 ### Install Metrics Server
 
 If you don't have the metrics server yet, you can install it via Helm.
@@ -146,10 +165,10 @@ Replace the `grid-intensity-exporter/values.yml` with the zone and API token obt
 Install the grid-intensity-exporter helm chart:
 
 ```bash
-kubectl apply -f keit/grid-intensity-exporter/namespace.yml
-kubectl apply -f keit/grid-intensity-exporter/servicemonitor.yml
+kubectl apply -f grid-intensity-exporter/namespace.yml
+kubectl apply -f grid-intensity-exporter/servicemonitor.yml
 git clone git@github.com:thegreenwebfoundation/grid-intensity-go.git
-helm install -n grid-intensity -f keit/grid-intensity-exporter/values.yml grid-intensity-exporter grid-intensity-go/helm/grid-intensity-exporter
+helm install -n grid-intensity -f grid-intensity-exporter/values.yml grid-intensity-exporter grid-intensity-go/helm/grid-intensity-exporter
 ```
 
 ### Get embodied emissions
@@ -160,11 +179,14 @@ If you are running on AWS, KEIT runs the Boavizta API in your cluster to dynamic
 
 #### If you are running on AWS EKS (dynamic)
 
-Install the helm chart:
+Install the helm chart, using the KEIT image that matches the release you checked out:
 
+<!-- PLACEHOLDER: image.tag below must match the keit-v0.3.0 placeholder, without the keit-v prefix. -->
 ```bash
-helm install --namespace keit -f helm/values.yaml keit-boavizta-exporter helm --create-namespace
+helm install --namespace keit -f helm/values.yaml --set image.tag=0.3.0 keit-boavizta-exporter helm --create-namespace
 ```
+
+The chart's default for `image.tag` is `latest`, so without `--set image.tag=...` you get the newest image, which may be newer than the release you checked out.
 
 And you can test that the Boavizta exporter is running:
 ```bash

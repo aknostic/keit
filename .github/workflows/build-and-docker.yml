@@ -4,7 +4,7 @@ on:
   workflow_dispatch:  # Allows manual triggering of the workflow
 jobs:
   check-admin:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     steps:
       - name: Verify Triggering User
         run: |
@@ -23,7 +23,7 @@ jobs:
           echo "Branch ${{ github.ref_name }} is authorized."
   build-and-dockerize:
     needs: check-admin  # wait for auth check before building
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     steps:
       # Step 1: Checkout the code
       - name: Checkout code

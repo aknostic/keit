@@ -167,7 +167,7 @@ Install the grid-intensity-exporter helm chart:
 ```bash
 kubectl apply -f grid-intensity-exporter/namespace.yml
 kubectl apply -f grid-intensity-exporter/servicemonitor.yml
-git clone git@github.com:thegreenwebfoundation/grid-intensity-go.git
+git clone https://github.com/thegreenwebfoundation/grid-intensity-go.git
 helm install -n grid-intensity -f grid-intensity-exporter/values.yml grid-intensity-exporter grid-intensity-go/helm/grid-intensity-exporter
 ```
 

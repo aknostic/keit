@@ -1,18 +1,62 @@
 # KEIT - Kubernetes Emissions Insights Tool
 
-KEIT is an open source tool which estimates the carbon emissions of a Kubernetes cluster. We have tested it on Kubernetes on bare metal and adapted to AWS' EKS and we are working on adapting it to work on Azure.
+KEIT estimates the carbon emissions of a Kubernetes cluster per workload and shows them in Grafana, so platform and DevOps engineers can see which workloads to fix first.
 
-KEIT uses other open source projects to accomplish this:
+![KEIT rightsizing dashboard on a real cluster](images/keit-dashboard.png)
+
+[GAP: screenshot. Needs a real cluster: a rightsizing or hotspots dashboard, saved as `images/keit-dashboard.png` or a short GIF. Remove this line when added.]
+
+## Does it work on my cluster?
+
+| Environment | Status | Notes |
+| --- | --- | --- |
+| Bare metal | ✅ Supported | Tested with Kepler chart `0.6.1`; newer Kepler is untested with KEIT (metric names changed). See [Install Kepler](#install-kepler). |
+| AWS EKS | ✅ Supported | Install Kepler chart `0.6.1`. |
+| Scaleway Kapsule | ✅ Supported | Via the [Scaleway footprint exporter](scaleway-footprint-exporter/). |
+| Azure AKS | 🚧 In progress | Work in progress. |
+| Google GKE | 📅 Planned | Planned. |
+
+On managed Kubernetes, nodes are virtual machines. Kepler v0.10 and later cannot report power inside a VM, so KEIT needs Kepler chart `0.6.1` there. [Install Kepler](#install-kepler) explains why.
+
+## How the number is calculated
+
+For each workload, KEIT combines three inputs into an SCI-style figure:
+
+**energy** ([Kepler](https://github.com/sustainable-computing-io/kepler)) × **grid carbon intensity** ([ElectricityMaps](https://app.electricitymaps.com/map/24h)) + **embodied share** of the hardware ([Boavizta](https://doc.api.boavizta.org/))
+
+On Scaleway, the provider's own footprint data is shown alongside this estimate.
+
+## What KEIT is not
+
+- **Not a measurement on VMs.** On a cloud VM, energy per workload is modelled, not measured. Treat the figures as estimates.
+- **Not audited reporting.** Do not use KEIT figures as audited emissions in a compliance or sustainability report.
+
+## Quick install
+
+[GAP: quick install, card 03. The one-command install is in draft PR #93 and is not merged. Replace this line with its "Quick install" section once merged. The manual steps under [Installation](#installation) work today.]
+
+## Getting help
+
+- Questions and ideas: [GitHub Discussions](https://github.com/aknostic/keit/discussions) [GAP: Discussions are switched on in card 05, AKNO-82; check the link works before merging].
+- Bugs and feature requests: [GitHub issues](https://github.com/aknostic/keit/issues).
+
+## Who builds this
+
+KEIT is built by [Aknostic](https://www.aknostic.com/case-studies/keit-kubernetes-emissions/?utm_source=github&utm_medium=readme&utm_campaign=keit-relaunch) in Utrecht. The link goes to the KEIT case study.
+
+## Credits
+
+KEIT builds on other open source projects:
 
 - [Kepler](https://github.com/sustainable-computing-io/kepler) for estimating the energy consumption of the running software.
 - [ElectricityMaps](https://app.electricitymaps.com/map/24h) to get the energy carbon intensity of the electricity consumed.
-- [grid-intensity-go](https://github.com/thegreenwebfoundation/grid-intensity-go)'s Prometheus exporter to get ElectriciyMaps data.
+- [grid-intensity-go](https://github.com/thegreenwebfoundation/grid-intensity-go)'s Prometheus exporter to get ElectricityMaps data.
 - [Boavizta API](https://doc.api.boavizta.org/) to get data about the embodied emissions of the hardware being used.
 - [Prometheus](https://prometheus.io/) to collect and store all this data.
 - [Grafana](https://grafana.com/) to visualize the data.
 - [Metrics Server](https://github.com/kubernetes-sigs/metrics-server) for data about resources utilisation.
 
-This means that to use KEIT you will need to install a few software components.
+To use KEIT you will need to install a few of these components.
 
 ![KEIT components](/images/keit-components.png)
 

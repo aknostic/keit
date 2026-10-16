@@ -21,7 +21,7 @@ Process of releasing a new docker image (admins only):
 
 ## Build and Publish scaleway-footprint-exporter (`workflows/build-scaleway-footprint-exporter.yml`)
 
-Released by pushing a `scaleway-footprint-exporter-v<version>` tag. See [Releasing](../scaleway-footprint-exporter/README.md#releasing-publishing-a-new-image) in the exporter's README.
+Works the same as KEIT: build-only on pull requests, released when a maintainer pushes a `scaleway-footprint-exporter-v<version>` tag on `main` (restricted to repository admins by the tag ruleset "Protect exporter release tags"). The tag must match `appVersion` in the chart, and there is no `latest` tag. See [Releasing](../scaleway-footprint-exporter/README.md#releasing-publishing-a-new-image) in the exporter's README.
 
 ## Dependabot (`dependabot.yml`)
 

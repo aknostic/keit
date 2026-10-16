@@ -1,0 +1,61 @@
+name: I'm running KEIT
+description: Tell us where and how you run KEIT, including what did not work
+title: "I'm running KEIT: "
+labels: ["adoption"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        This helps us see where KEIT works and where it does not. You do not need to share anything you are not comfortable with, and you do not need to name your organisation.
+  - type: input
+    id: environment
+    attributes:
+      label: Cluster type and provider
+      description: Bare metal, EKS, GKE, AKS, Scaleway Kapsule, k3s and so on, with the region.
+    validations:
+      required: true
+  - type: input
+    id: scale
+    attributes:
+      label: Rough size of the cluster
+      placeholder: e.g. 6 nodes
+  - type: input
+    id: kepler
+    attributes:
+      label: Kepler version
+  - type: dropdown
+    id: state
+    attributes:
+      label: Where are you with it?
+      options:
+        - Trying it out
+        - Running it on a test or staging cluster
+        - Running it in production
+        - Tried it and stopped
+    validations:
+      required: true
+  - type: textarea
+    id: worked
+    attributes:
+      label: What worked
+  - type: textarea
+    id: not-worked
+    attributes:
+      label: What did not work, or what you had to change
+      description: Missing metrics, dashboards with no data, steps that needed adapting for your provider.
+  - type: textarea
+    id: use
+    attributes:
+      label: What are you using the numbers for?
+      description: For example finding hotspots, rightsizing, or reporting. Optional.
+  - type: dropdown
+    id: public
+    attributes:
+      label: May we list you publicly?
+      description: For example on an adopters list. We will only do this if you say yes here.
+      options:
+        - "No"
+        - "Yes, you may list my organisation"
+        - "Yes, by name, but ask me first"
+    validations:
+      required: true

@@ -1,0 +1,51 @@
+name: Feature or method proposal
+description: Suggest a new feature, or a change to how KEIT estimates emissions
+labels: ["enhancement"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        KEIT produces an estimate, and the method matters as much as the code. If you are proposing a change to the method, please say what you would change and why.
+  - type: dropdown
+    id: kind
+    attributes:
+      label: What kind of proposal is this?
+      options:
+        - Feature
+        - Method change (energy, carbon intensity or embodied emissions)
+        - Emission factor or PUE source
+        - New dashboard or dashboard change
+        - Support for another provider or distribution
+        - Other
+    validations:
+      required: true
+  - type: textarea
+    id: problem
+    attributes:
+      label: What problem does this solve?
+      description: What can you not do, or not trust, today?
+    validations:
+      required: true
+  - type: textarea
+    id: proposal
+    attributes:
+      label: What do you propose?
+    validations:
+      required: true
+  - type: textarea
+    id: sources
+    attributes:
+      label: Sources
+      description: Links to papers, provider documentation or data that support the proposal. For a PUE or emission factor, link where the provider publishes it.
+  - type: textarea
+    id: alternatives
+    attributes:
+      label: Alternatives you considered
+  - type: dropdown
+    id: help
+    attributes:
+      label: Would you like to work on it?
+      options:
+        - "Yes, I can open a pull request"
+        - "Yes, with some guidance"
+        - "No, I am suggesting it"

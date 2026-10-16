@@ -1,0 +1,67 @@
+name: Bug report
+description: Something in KEIT, an exporter or a dashboard does not work as documented
+labels: ["bug"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for reporting. The more of the fields below you can fill in, the faster we can reproduce the problem. Do not paste API tokens or other credentials.
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened, and what did you expect?
+    validations:
+      required: true
+  - type: dropdown
+    id: component
+    attributes:
+      label: Which part is affected?
+      options:
+        - KEIT (source/)
+        - Scaleway footprint exporter
+        - grid-intensity exporter configuration
+        - Helm chart
+        - Grafana dashboard
+        - Documentation
+        - Not sure
+    validations:
+      required: true
+  - type: input
+    id: dashboard
+    attributes:
+      label: Which dashboard, if any?
+      placeholder: e.g. KEIT_grafana_dashboard.json, keit-rightsizing
+  - type: input
+    id: cluster
+    attributes:
+      label: Cluster type and provider
+      description: Bare metal, EKS, GKE, AKS, Scaleway Kapsule, k3s and so on, with the region.
+    validations:
+      required: true
+  - type: input
+    id: kepler
+    attributes:
+      label: Kepler version
+      description: Binary and Helm chart version, for example 0.8.0 / chart 0.6.1.
+    validations:
+      required: true
+  - type: input
+    id: keit-version
+    attributes:
+      label: KEIT version or commit
+      placeholder: e.g. ghcr.io/aknostic/keit:0.0.12
+  - type: textarea
+    id: prometheus
+    attributes:
+      label: Prometheus configuration
+      description: Prometheus or Mimir version, how you scrape the exporters, any external labels (such as `kubernetes_cluster`) and `tsdb.outOfOrderTimeWindow` if you set it.
+      render: yaml
+  - type: textarea
+    id: reproduce
+    attributes:
+      label: Steps to reproduce
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs or screenshots
+      description: Relevant logs, the query that returns the wrong value, or a screenshot of the panel.

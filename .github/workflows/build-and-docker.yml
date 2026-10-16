@@ -2,6 +2,9 @@
 name: Build and Dockerize KEIT Go Application
 on:
   workflow_dispatch:  # Allows manual triggering of the workflow
+permissions:
+  contents: write  # commit and push the version bump
+  packages: write  # push the image to ghcr.io
 jobs:
   check-admin:
     runs-on: ubuntu-26.04
@@ -68,7 +71,7 @@ jobs:
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
-          password: ${{ secrets.GTH_TOKEN }}
+          password: ${{ secrets.GITHUB_TOKEN }}
       # Step 6: Push Docker image to GitHub Container Registry
       - name: Push Docker image to GitHub Container Registry
         run: |

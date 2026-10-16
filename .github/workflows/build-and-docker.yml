@@ -2,9 +2,12 @@
 name: Build and Dockerize KEIT Go Application
 on:
   workflow_dispatch:  # Allows manual triggering of the workflow
+permissions:
+  contents: write  # commit and push the version bump
+  packages: write  # push the image to ghcr.io
 jobs:
   check-admin:
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     steps:
       - name: Verify Triggering User
         run: |
@@ -23,7 +26,7 @@ jobs:
           echo "Branch ${{ github.ref_name }} is authorized."
   build-and-dockerize:
     needs: check-admin  # wait for auth check before building
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-26.04
     steps:
       # Step 1: Checkout the code
       - name: Checkout code
@@ -33,7 +36,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v5
         with:
-          go-version: '1.25'
+          go-version: '1.26'
           cache-dependency-path: |
              source/go.sum
       # Step 3: Read and increment version
@@ -68,7 +71,7 @@ jobs:
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
-          password: ${{ secrets.GTH_TOKEN }}
+          password: ${{ secrets.GITHUB_TOKEN }}
       # Step 6: Push Docker image to GitHub Container Registry
       - name: Push Docker image to GitHub Container Registry
         run: |

@@ -16,6 +16,8 @@ This means that to use KEIT you will need to install a few software components.
 
 ![KEIT components](/images/keit-components.png)
 
+See the [roadmap](ROADMAP.md) for what we plan to work on, and [ADOPTERS.md](ADOPTERS.md) for who runs KEIT and how to add yourself.
+
 
 ## Installation
 

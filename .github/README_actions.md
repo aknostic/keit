@@ -1,11 +1,28 @@
-Behavior github action: Build and Dockerize KEIT Go Application.
-- Can only be run by locomundo and geurjas (admins)
-- It runs only in a branch (not in the main branch)
+GitHub Actions in this repository.
 
-Process of building a new docker image:
+## Build and Publish KEIT (`workflows/build-and-docker.yml`)
 
-1. Create a new branch
-2. Start manual the githubaction - Build and Dockerize KEIT Go Application - for this branch. (only amdins)
-3. This will update the VERSION file in this branch. New docker images is pushed to our ghcr with tag VERSION (one minor version higher)
-4. create yourself a pull request of this branch to main.
-5. Merge the pull request to main. (only admins can bypass the review).
+- On every pull request that changes `source/`, the KEIT image is built as a check. Nothing is pushed, so this is safe for pull requests from forks.
+- A new image is only published when a maintainer pushes a `keit-v<version>` tag.
+- Creating, changing or deleting `keit-v*` tags is limited to repository admins (maintainers) by the tag ruleset "Protect KEIT release tags".
+- The tag must point to a commit on `main`, otherwise the release stops.
+
+Process of releasing a new docker image (admins only):
+
+1. Merge the changes to `main` through a pull request.
+2. Tag the commit on `main` and push the tag:
+   ```bash
+   git switch main
+   git pull
+   git tag keit-v0.0.12
+   git push origin keit-v0.0.12
+   ```
+3. The workflow pushes `ghcr.io/aknostic/keit:<version>` and moves `ghcr.io/aknostic/keit:latest` to it.
+
+## Build and Publish scaleway-footprint-exporter (`workflows/build-scaleway-footprint-exporter.yml`)
+
+Released by pushing a `scaleway-footprint-exporter-v<version>` tag. See [Releasing](../scaleway-footprint-exporter/README.md#releasing-publishing-a-new-image) in the exporter's README.
+
+## Dependabot (`dependabot.yml`)
+
+Opens weekly pull requests for Go modules (`source/`, `scaleway-footprint-exporter/`), the Dockerfile base images and the GitHub Actions used in the workflows.

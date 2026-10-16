@@ -1,5 +1,13 @@
 # KEIT - Kubernetes Emissions Insights Tool
 
+[![License: Apache 2.0](https://img.shields.io/github/license/aknostic/keit)](LICENSE)
+<!-- [GAP: listing URL] Uncomment once the chart is registered on Artifact Hub; replace <package-path> with the path from the listing (artifacthub.io/packages/helm/<repo>/keit):
+[![Artifact Hub](https://img.shields.io/endpoint?url=https://artifacthub.io/badge/repository/<repo-name>)](https://artifacthub.io/packages/helm/<package-path>)
+-->
+<!-- [GAP: listing URL] Uncomment once the dashboards are published; replace <id> with the grafana.com dashboard ID:
+[![Grafana dashboard](https://img.shields.io/badge/Grafana-dashboards-F46800?logo=grafana&logoColor=white)](https://grafana.com/grafana/dashboards/<id>)
+-->
+
 KEIT is an open source tool which estimates the carbon emissions of a Kubernetes cluster. We have tested it on Kubernetes on bare metal and adapted to AWS' EKS and we are working on adapting it to work on Azure.
 
 KEIT uses other open source projects to accomplish this:
@@ -223,4 +231,6 @@ The `grafana/dashboards/` directory contains four more dashboards developed for 
 - **`keit-rightsizing`** — Kepler + kube-state-metrics for overprovisioned / underprovisioned pods
 
 See [`grafana/dashboards/README.md`](grafana/dashboards/README.md) for what each does, required metrics, and how to import them.
+
+<!-- [GAP: listing URL] After publishing, add: "Also on grafana.com: <links to the five dashboard listings>" and "Helm chart on Artifact Hub: <listing URL>". -->
 

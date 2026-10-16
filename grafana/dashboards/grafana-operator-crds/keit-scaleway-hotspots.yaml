@@ -650,5 +650,16 @@ spec:
           "version": "1.0.0"
         }
       ],
-      "uid": "keit-scaleway-hotspots"
+      "uid": "keit-scaleway-hotspots",
+      "description": "Carbon hotspots on Scaleway: top projects, top SKUs, the regional grid effect (same machine in different zones) and regression detection. Required metrics (from keit/scaleway-footprint-exporter): keit_scaleway_co2_kg, keit_scaleway_water_m3, keit_scaleway_data_lag_days, keit_scaleway_scrape_success. Part of KEIT, the Kubernetes Emissions Insights Tool.",
+      "links": [
+        {
+          "title": "KEIT on GitHub",
+          "type": "link",
+          "url": "https://github.com/aknostic/keit?utm_source=grafana-com&utm_medium=dashboard&utm_campaign=keit-relaunch&utm_content=keit-scaleway-hotspots",
+          "targetBlank": true,
+          "icon": "external link",
+          "tooltip": "Source, install guide and issues"
+        }
+      ]
     }

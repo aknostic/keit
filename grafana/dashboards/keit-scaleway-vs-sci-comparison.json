@@ -680,5 +680,16 @@
       "version": "1.0.0"
     }
   ],
-  "uid": "keit-scaleway-vs-sci-comparison"
+  "uid": "keit-scaleway-vs-sci-comparison",
+  "description": "Side by side: the Software Carbon Intensity (SCI) figure KEIT computes against the figure bundled in Scaleway's own data, with the gap broken down. Required metrics: keit_scaleway_co2_kg and keit_scaleway_water_m3 (keit/scaleway-footprint-exporter), kepler_container_joules_total and kepler_node_platform_joules_total (Kepler v0.8.0 / chart 0.6.1), grid_intensity_carbon_average (grid-intensity-go v0.7.0). Part of KEIT, the Kubernetes Emissions Insights Tool.",
+  "links": [
+    {
+      "title": "KEIT on GitHub",
+      "type": "link",
+      "url": "https://github.com/aknostic/keit?utm_source=grafana-com&utm_medium=dashboard&utm_campaign=keit-relaunch&utm_content=keit-scaleway-vs-sci-comparison",
+      "targetBlank": true,
+      "icon": "external link",
+      "tooltip": "Source, install guide and issues"
+    }
+  ]
 }

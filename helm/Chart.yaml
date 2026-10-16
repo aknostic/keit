@@ -4,3 +4,34 @@ description: A Helm chart for deploying keit-app and boavizta-app in the keit na
 type: application
 version: 0.2.0
 appVersion: 1.0.0
+home: https://github.com/aknostic/keit
+sources:
+  - https://github.com/aknostic/keit
+keywords:
+  - carbon
+  - emissions
+  - sustainability
+  - green-software
+  - kepler
+  - sci
+  - observability
+maintainers:
+  - name: Aknostic
+    url: https://aknostic.com
+annotations:
+  artifacthub.io/license: Apache-2.0
+  artifacthub.io/category: monitoring-logging
+  artifacthub.io/containsSecurityUpdates: "false"
+  artifacthub.io/links: |
+    - name: Source code and install guide
+      url: https://github.com/aknostic/keit
+    - name: Reusable Grafana dashboards
+      url: https://github.com/aknostic/keit/tree/main/grafana/dashboards
+    - name: Report an issue
+      url: https://github.com/aknostic/keit/issues
+  artifacthub.io/images: |
+    - name: keit
+      image: ghcr.io/aknostic/keit:latest
+    - name: boaviztapi
+      image: ghcr.io/boavizta/boaviztapi:latest
+  # [GAP: artifacthub.io/changes, and pin the image tags above to the released versions (card 3)]

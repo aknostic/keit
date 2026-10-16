@@ -18,13 +18,22 @@
   "editable": true,
   "fiscalYearStartMonth": 0,
   "graphTooltip": 0,
-  "links": [],
+  "links": [
+    {
+      "title": "KEIT on GitHub",
+      "type": "link",
+      "url": "https://github.com/aknostic/keit?utm_source=grafana-com&utm_medium=dashboard&utm_campaign=keit-relaunch&utm_content=babfe92a-42e3-45fd-baf1-ea503e23fca6",
+      "targetBlank": true,
+      "icon": "external link",
+      "tooltip": "Source, install guide and issues"
+    }
+  ],
   "liveNow": false,
   "panels": [
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "prometheus"
+        "uid": "${datasource}"
       },
       "gridPos": {
         "h": 2,
@@ -62,7 +71,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "prometheus"
+        "uid": "${datasource}"
       },
       "gridPos": {
         "h": 10,
@@ -88,7 +97,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "prometheus"
+        "uid": "${datasource}"
       },
       "gridPos": {
         "h": 10,
@@ -114,7 +123,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "prometheus"
+        "uid": "${datasource}"
       },
       "gridPos": {
         "h": 10,
@@ -140,7 +149,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "prometheus"
+        "uid": "${datasource}"
       },
       "gridPos": {
         "h": 10,
@@ -166,7 +175,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "prometheus"
+        "uid": "${datasource}"
       },
       "gridPos": {
         "h": 10,
@@ -205,7 +214,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "prometheus"
+        "uid": "${datasource}"
       },
       "description": "Energy in kWh",
       "fieldConfig": {
@@ -259,7 +268,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "${datasource}"
           },
           "editorMode": "code",
           "expr": "sum(increase(kepler_container_joules_total{container_namespace=~\"$namespace\", pod_name=~\"$pod\"}[ $__range ])) * $watt_per_second_to_kWh\n",
@@ -275,7 +284,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "prometheus"
+        "uid": "${datasource}"
       },
       "fieldConfig": {
         "defaults": {
@@ -330,7 +339,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "${datasource}"
           },
           "editorMode": "code",
           "expr": "avg(avg_over_time(grid_intensity_carbon_average{is_estimated=\"true\"}[$__range]))",
@@ -346,7 +355,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "prometheus"
+        "uid": "${datasource}"
       },
       "description": "Embodied Carbon Emissions",
       "fieldConfig": {
@@ -398,7 +407,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "${datasource}"
           },
           "editorMode": "code",
           "expr": "($__range_s/157766400)*sum(eks_node_embedded_value{node_name=~\".*\"})*1000",
@@ -414,7 +423,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "prometheus"
+        "uid": "${datasource}"
       },
       "gridPos": {
         "h": 9,
@@ -439,7 +448,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "prometheus"
+        "uid": "${datasource}"
       },
       "fieldConfig": {
         "defaults": {
@@ -490,7 +499,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "${datasource}"
           },
           "editorMode": "code",
           "expr": "(($Energy * $EnergyCarbonIntensity * $PUE_avr_aws) + ($__range_s/157766400)*sum(eks_node_embedded_value{node_name=~\".*\"})*1000)",
@@ -506,7 +515,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "prometheus"
+        "uid": "${datasource}"
       },
       "fieldConfig": {
         "defaults": {
@@ -560,7 +569,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "${datasource}"
           },
           "editorMode": "code",
           "expr": "sum by (container_namespace) (\n  increase(\n      (kepler_container_joules_total{container_namespace=~\"$namespace\", pod_name=~\"$pod\"}[$__range])\n  )\n) * $watt_per_second_to_kWh ",
@@ -576,7 +585,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "prometheus"
+        "uid": "${datasource}"
       },
       "fieldConfig": {
         "defaults": {
@@ -663,7 +672,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "${datasource}"
           },
           "editorMode": "code",
           "expr": "(($__range_s/157766400)*sum(eks_node_embedded_value{node_name=~\".*\"})*1000 / (($Energy * $EnergyCarbonIntensity * $PUE_avr_aws) + ($__range_s/157766400)*sum(eks_node_embedded_value{node_name=~\".*\"})*1000)) * 100",
@@ -679,7 +688,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "prometheus"
+        "uid": "${datasource}"
       },
       "fieldConfig": {
         "defaults": {
@@ -758,7 +767,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "${datasource}"
           },
           "editorMode": "code",
           "expr": "avg(100 - (avg by (instance) (irate(node_cpu_seconds_total{mode=\"idle\"}[15m:1m])) * 100))",
@@ -774,7 +783,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "prometheus"
+        "uid": "${datasource}"
       },
       "fieldConfig": {
         "defaults": {
@@ -853,7 +862,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "${datasource}"
           },
           "editorMode": "code",
           "expr": "100 - (avg by (instance) (irate(node_cpu_seconds_total{mode=\"idle\"}[15m:1m])) * 100)\n\n",
@@ -869,7 +878,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "prometheus"
+        "uid": "${datasource}"
       },
       "fieldConfig": {
         "defaults": {
@@ -948,7 +957,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "${datasource}"
           },
           "disableTextWrap": false,
           "editorMode": "code",
@@ -968,7 +977,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "prometheus"
+        "uid": "${datasource}"
       },
       "fieldConfig": {
         "defaults": {
@@ -1016,7 +1025,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "${datasource}"
           },
           "editorMode": "code",
           "expr": "sum by (container_namespace) (\n  increase(\n      (kepler_container_joules_total{container_namespace=~\"$namespace\", pod_name=~\"$pod\"}[$__range])\n  )\n) * $watt_per_second_to_kWh ",
@@ -1032,7 +1041,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "prometheus"
+        "uid": "${datasource}"
       },
       "fieldConfig": {
         "defaults": {
@@ -1111,7 +1120,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "${datasource}"
           },
           "editorMode": "code",
           "expr": "sum(increase(\n          (kepler_container_joules_total{container_namespace=~\"$namespace\", pod_name=~\"$pod\"}[$__range])\n      )\n   ) * $watt_per_second_to_kWh",
@@ -1127,7 +1136,7 @@
     {
       "datasource": {
         "type": "prometheus",
-        "uid": "prometheus"
+        "uid": "${datasource}"
       },
       "description": "see:\nhttps://github.com/hoernschen/grasp/tree/main/src/lib/comparison/distance\n\nPlane: 122.72 g per km",
       "fieldConfig": {
@@ -1181,7 +1190,7 @@
         {
           "datasource": {
             "type": "prometheus",
-            "uid": "prometheus"
+            "uid": "${datasource}"
           },
           "editorMode": "code",
           "expr": "((($Energy * $EnergyCarbonIntensity * $PUE_avr_aws) + ($__range_s/157766400)*sum(eks_node_embedded_value{node_name=~\".*\"})*1000))/122.72",
@@ -1197,7 +1206,13 @@
   ],
   "refresh": "",
   "schemaVersion": 39,
-  "tags": [],
+  "tags": [
+    "keit",
+    "sustainability",
+    "kepler",
+    "carbon",
+    "sci"
+  ],
   "templating": {
     "list": [
       {
@@ -1313,7 +1328,7 @@
         },
         "datasource": {
           "type": "prometheus",
-          "uid": "prometheus"
+          "uid": "${datasource}"
         },
         "definition": "query_result(scalar(sum(increase(kepler_container_joules_total{container_namespace=~\"$namespace\", pod_name=~\"$pod\"}[ $__range ])) * $watt_per_second_to_kWh))",
         "description": "kWh",
@@ -1342,7 +1357,7 @@
         },
         "datasource": {
           "type": "prometheus",
-          "uid": "prometheus"
+          "uid": "${datasource}"
         },
         "definition": "query_result(scalar(avg(avg_over_time(grid_intensity_carbon_average{is_estimated=\"true\"}[$__range]))))",
         "description": "gCO2e/kWh",
@@ -1371,7 +1386,7 @@
         },
         "datasource": {
           "type": "prometheus",
-          "uid": "prometheus"
+          "uid": "${datasource}"
         },
         "definition": "query_result(scalar(($__range_s/$seconds_five_years)*sum(eks_node_embedded_value{node_name=~\".*\"})*1000))",
         "description": "gCO2eq",
@@ -1400,7 +1415,7 @@
         },
         "datasource": {
           "type": "prometheus",
-          "uid": "prometheus"
+          "uid": "${datasource}"
         },
         "definition": "query_result((($Energy * $EnergyCarbonIntensity * $PUE_avr_aws) + $Embodied))",
         "hide": 2,
@@ -1430,5 +1445,6 @@
   "title": "Carbon intensity EKS - KEIT (Ierland)",
   "uid": "babfe92a-42e3-45fd-baf1-ea503e23fca6",
   "version": 2,
-  "weekStart": ""
+  "weekStart": "",
+  "description": "Software Carbon Intensity (SCI) of a Kubernetes cluster: energy (E) from Kepler, grid carbon intensity (I) from grid-intensity-go, embodied emissions (M) from the Boavizta API via the KEIT exporter, and a functional unit (R), with per-namespace breakdowns. Required metrics: kepler_container_joules_total, kepler_container_package_joules_total, grid_intensity_carbon_average, eks_node_embedded_value. Edit the PUE_avr_aws variable to your data centre's PUE. Part of KEIT, the Kubernetes Emissions Insights Tool."
 }

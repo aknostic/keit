@@ -632,5 +632,16 @@
       "version": "1.0.0"
     }
   ],
-  "uid": "keit-scaleway-footprint"
+  "uid": "keit-scaleway-footprint",
+  "description": "Raw Scaleway environmental footprint data: CO2 and water by project, region, SKU and service category, with daily trends and flight-km equivalents. Required metrics (from keit/scaleway-footprint-exporter): keit_scaleway_co2_kg, keit_scaleway_water_m3, keit_scaleway_data_lag_days, keit_scaleway_scrape_success. Part of KEIT, the Kubernetes Emissions Insights Tool.",
+  "links": [
+    {
+      "title": "KEIT on GitHub",
+      "type": "link",
+      "url": "https://github.com/aknostic/keit?utm_source=grafana-com&utm_medium=dashboard&utm_campaign=keit-relaunch&utm_content=keit-scaleway-footprint",
+      "targetBlank": true,
+      "icon": "external link",
+      "tooltip": "Source, install guide and issues"
+    }
+  ]
 }

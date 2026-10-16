@@ -1,0 +1,11 @@
+# Artifact Hub repository metadata for the KEIT Helm chart.
+# Docs: https://artifacthub.io/docs/topics/repositories/#artifact-hub-repository-metadata-file
+#
+# [GAP: repositoryID — Artifact Hub generates it when the repository is added in the
+#  control panel. Paste it here to claim "verified publisher" status.]
+# repositoryID: 00000000-0000-0000-0000-000000000000
+#
+# [GAP: owners — which KEIT maintainer emails to list publicly; the maintainers decide.]
+# owners:
+#   - name: Aknostic
+#     email: <maintainer email>

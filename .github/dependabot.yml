@@ -3,4 +3,18 @@ updates:
   - package-ecosystem: gomod
     directory: /source
     schedule:
-      interval: weekly 
+      interval: weekly
+  - package-ecosystem: gomod
+    directory: /scaleway-footprint-exporter
+    schedule:
+      interval: weekly
+  - package-ecosystem: docker
+    directories:
+      - /source
+      - /scaleway-footprint-exporter
+    schedule:
+      interval: weekly
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly

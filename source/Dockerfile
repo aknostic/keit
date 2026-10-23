@@ -1,5 +1,6 @@
 # Start with the official Golang image as the build environment
-FROM golang:1.27 AS builder
+# Go 1.27.3+ distrusts the compromised eMudhra intermediates (CVE-2026-111943)
+FROM golang:1.27.3 AS builder
 
 # Set the working directory inside the container
 WORKDIR /app
@@ -19,8 +20,9 @@ RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o /main .
 # Start a new stage from scratch
 FROM alpine:3.24
 
-# Install certificates for HTTPS support
-RUN apk add --no-cache ca-certificates
+# Install certificates for HTTPS support; upgrade both packages so the base
+# image's ca-certificates-bundle doesn't keep the old (pre-eMudhra-fix) roots
+RUN apk add --no-cache --upgrade ca-certificates ca-certificates-bundle
 
 # Copy the binary from the builder
 COPY --from=builder /main /main

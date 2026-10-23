@@ -99,13 +99,13 @@ export KUBECONFIG=/path/to/your/kubeconfig
 #    image, for people who intend to vendor/patch the raw manifests with
 #    their own build. To use the published image instead, edit the `image:`
 #    line in manifests/deployment.yml and point it at
-#    ghcr.io/aknostic/scaleway-footprint-exporter:0.2.1 (no build/push
+#    ghcr.io/aknostic/scaleway-footprint-exporter:0.2.2 (no build/push
 #    needed). Only build & push your own image if you're vendoring a
 #    modified one.
 #
-#    Note: the 0.2.1 tag becomes available on GHCR only after the
-#    scaleway-footprint-exporter-v0.2.1 release tag is pushed and its build
-#    workflow has run. Until then, use an existing tag such as 0.2.0 or
+#    Note: the 0.2.2 tag becomes available on GHCR only after the
+#    scaleway-footprint-exporter-v0.2.2 release tag is pushed and its build
+#    workflow has run. Until then, use an existing tag such as 0.2.1 or
 #    latest.
 
 # 2. Namespace + Secret + Deployment + Service
